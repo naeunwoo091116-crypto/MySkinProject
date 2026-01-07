@@ -1,0 +1,770 @@
+from flask import Flask, render_template, request, jsonify
+import torch
+import torch.nn as nn
+from torchvision import transforms, models
+from PIL import Image
+import io
+import os
+import json
+from datetime import datetime
+from pathlib import Path
+from sqlalchemy.orm import Session
+from models import engine, SessionLocal, User, AnalysisHistory, init_db
+import numpy as np
+
+# MediaPipe 초기화 - 얼굴 검증 비활성화
+MEDIAPIPE_AVAILABLE = False
+print("⚠️ MediaPipe 얼굴 검증 비활성화 (기본 검증만 사용)")
+
+app = Flask(__name__)
+
+# ==========================================
+# 데이터베이스 설정
+# ==========================================
+# 애플리케이션 시작 시 테이블 생성
+try:
+    init_db()
+    print("✅ 데이터베이스 연결 성공!")
+except Exception as e:
+    print(f"⚠️ 데이터베이스 초기화 오류: {e}")
+    print("   JSON 파일 백업 모드로 실행됩니다.")
+
+def get_db():
+    """데이터베이스 세션 생성"""
+    db = SessionLocal()
+    try:
+        return db
+    except:
+        db.close()
+        raise
+
+# ==========================================
+# 1. 모델 클래스 정의 (보내주신 구조 그대로)
+# ==========================================
+class ResNetBalanced(nn.Module):
+    def __init__(self, num_classes, num_regression_targets):
+        super().__init__()
+        
+        # weights=None: 서버 실행 시 다운로드 방지 및 로컬 가중치 사용
+        resnet = models.resnet34(weights=None) 
+        self.features = nn.Sequential(*list(resnet.children())[:-1])
+
+        self.classifier = nn.Sequential(
+            nn.Flatten(),
+            nn.Dropout(0.5),
+            nn.Linear(512, 256),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Linear(256, num_classes)
+        )
+
+        self.regressor = nn.Sequential(
+            nn.Flatten(),
+            nn.Dropout(0.5),
+            nn.Linear(512, 384),
+            nn.ReLU(),
+            nn.BatchNorm1d(384),
+            nn.Dropout(0.4),
+            nn.Linear(384, 256),
+            nn.ReLU(),
+            nn.BatchNorm1d(256),
+            nn.Dropout(0.3),
+            nn.Linear(256, num_regression_targets)
+        )
+
+    def forward(self, x):
+        x = self.features(x)
+        return self.classifier(x), self.regressor(x)
+
+# ==========================================
+# 2. 부위별 파라미터 설정 (ZONE_PARAMS 반영)
+# ==========================================
+# HTML에서 사용하는 이름(key)과 사용자님의 설정을 연결했습니다.
+# 파일 경로("models/xxxx.pth")가 실제 파일명과 맞는지 꼭 확인하세요!
+MODEL_CONFIGS = {
+    "forehead": { # Zone 1
+        "path": "models/forehead_model.pth",
+        "num_classes": 4,
+        "num_targets": 15
+    },
+    "eye_l": {    # Zone 3 (왼쪽 눈가)
+        "path": "models/left_eye_model.pth",
+        "num_classes": 4,
+        "num_targets": 8
+    },
+    "eye_r": {    # Zone 4 (오른쪽 눈가)
+        "path": "models/right_eye_model.pth",
+        "num_classes": 4,
+        "num_targets": 8
+    },
+    "cheek_l": {  # Zone 5 (왼쪽 볼)
+        "path": "models/left_cheek_model.pth",
+        "num_classes": 4,
+        "num_targets": 16
+    },
+    "cheek_r": {  # Zone 6 (오른쪽 볼)
+        "path": "models/right_cheek_model.pth",
+        "num_classes": 4,
+        "num_targets": 16
+    },
+    "chin": {     # Zone 8 (턱)
+        "path": "models/chin_model.pth",
+        "num_classes": 4,
+        "num_targets": 15
+    }
+}
+
+device = torch.device('cpu')
+loaded_models = {}
+
+print("--- AI 모델 로딩 시작 (부위별 설정 적용) ---")
+
+# 설정값(config)을 하나씩 꺼내서 모델을 맞춤 생성합니다.
+for region_name, config in MODEL_CONFIGS.items():
+    path = config["path"]
+    n_cls = config["num_classes"]
+    n_reg = config["num_targets"]
+
+    try:
+        if os.path.exists(path):
+            print(f"🔄 로딩 중: {region_name} (Class:{n_cls}, Reg:{n_reg})")
+            
+            # [핵심 변경 사항] 각 부위에 맞는 파라미터로 모델 생성
+            model = ResNetBalanced(num_classes=n_cls, num_regression_targets=n_reg)
+            
+            # 가중치 로드
+            checkpoint = torch.load(path, map_location=device)
+            
+            if isinstance(checkpoint, dict):
+                if 'state_dict' in checkpoint:
+                    state_dict = checkpoint['state_dict']
+                elif 'model' in checkpoint:
+                    state_dict = checkpoint['model']
+                else:
+                    state_dict = checkpoint
+            else:
+                state_dict = checkpoint
+            
+            model.load_state_dict(state_dict)
+            model.eval() # 평가 모드 (필수)
+            
+            loaded_models[region_name] = model
+            print(f"✅ {region_name} 로드 성공!")
+        else:
+            print(f"❌ 파일 없음: {path}")
+            
+    except Exception as e:
+        print(f"⚠️ {region_name} 로드 실패: {e}")
+        print(f"-> 설정값(num_classes={n_cls}, targets={n_reg})이 .pth 파일과 맞는지 확인하세요.")
+
+# 이미지 전처리
+transform = transforms.Compose([
+    transforms.Resize((224, 224)),
+    transforms.ToTensor(),
+    transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+])
+
+# ==========================================
+# 상세 피부 분석 메트릭 매핑
+# ==========================================
+# Regression 값들을 의미 있는 지표로 변환
+# 각 부위별로 다른 개수의 regression target을 가지므로 유연하게 처리
+METRIC_NAMES = {
+    "forehead": ["주름_깊이", "주름_밀도", "색소침착", "피부톤_균일도", "탄력도", "모공_크기",
+                 "피지_분비", "수분도", "거칠기", "홍반", "각질", "광택도", "투명도", "미세주름", "처짐"],
+    "eye_l": ["주름_깊이", "다크서클", "부기", "탄력도", "미세주름", "색소침착", "처짐", "건조도"],
+    "eye_r": ["주름_깊이", "다크서클", "부기", "탄력도", "미세주름", "색소침착", "처짐", "건조도"],
+    "cheek_l": ["모공_크기", "피지_분비", "색소침착", "홍반", "탄력도", "주름", "수분도", "피부톤",
+                "거칠기", "광택도", "각질", "투명도", "미세주름", "처짐", "잡티", "혈관"],
+    "cheek_r": ["모공_크기", "피지_분비", "색소침착", "홍반", "탄력도", "주름", "수분도", "피부톤",
+                "거칠기", "광택도", "각질", "투명도", "미세주름", "처짐", "잡티", "혈관"],
+    "chin": ["여드름", "피지_분비", "모공_크기", "색소침착", "홍반", "탄력도", "거칠기", "각질",
+             "수분도", "피부톤", "미세주름", "처짐", "광택도", "투명도", "잡티"]
+}
+
+def parse_regression_values(region_name, reg_values):
+    """
+    Regression 값을 의미 있는 딕셔너리로 변환
+
+    모델 출력 범위에 따라 적응형 정규화 적용:
+    - 매우 작은 값(0-1 범위): 100배 스케일링
+    - 중간 값(0-10 범위): 10배 스케일링
+    - 큰 값(그 이상): 그대로 사용
+    """
+    metrics = METRIC_NAMES.get(region_name, [])
+    parsed = {}
+
+    # 전체 값의 범위 확인
+    if reg_values:
+        max_val = max(abs(v) for v in reg_values)
+
+        # 적응형 스케일 팩터 결정
+        if max_val < 0.1:
+            scale_factor = 1000  # 매우 작은 값 (0~0.1 범위)
+        elif max_val < 1:
+            scale_factor = 100   # 작은 값 (0.1~1 범위)
+        elif max_val < 10:
+            scale_factor = 10    # 중간 값 (1~10 범위)
+        else:
+            scale_factor = 1     # 이미 적절한 범위
+
+    for i, metric_name in enumerate(metrics):
+        if i < len(reg_values):
+            # 적응형 스케일링 적용
+            raw_value = reg_values[i]
+            normalized = max(0, min(100, abs(raw_value) * scale_factor))
+            parsed[metric_name] = round(normalized, 1)  # 소수점 1자리
+
+    return parsed
+
+# ==========================================
+# AI 기반 LED 추천 엔진 (확장 가능 설계)
+# ==========================================
+class LEDRecommendationEngine:
+    """
+    Seeed Xiao BLE 보드 LED 테스트를 위한 확장 가능한 추천 시스템
+
+    현재: 기본 규칙 기반 추천
+    향후 확장:
+    - BLE 통신 프로토콜 추가
+    - 실시간 센서 피드백 통합
+    - ML 기반 개인화 추천
+    """
+
+    # LED 모드 정의 (향후 Xiao BLE 펌웨어와 매핑)
+    LED_MODES = {
+        "red": {
+            "wavelength": 630,
+            "benefits": ["주름개선", "탄력증진", "콜라겐생성"],
+            "target_issues": ["wrinkle", "elasticity", "sagging"]
+        },
+        "blue": {
+            "wavelength": 415,
+            "benefits": ["여드름완화", "모공진정", "피지조절"],
+            "target_issues": ["acne", "pore", "sebum", "redness"]
+        },
+        "gold": {
+            "wavelength": 590,
+            "benefits": ["미백", "색소완화", "피부톤개선"],
+            "target_issues": ["pigmentation", "tone", "dark_spot"]
+        }
+    }
+
+    @staticmethod
+    def recommend(analysis_results):
+        """
+        피부 분석 결과를 기반으로 최적의 LED 모드 추천
+
+        Args:
+            analysis_results: {"overall_score": int, "regions": {...}}
+
+        Returns:
+            {
+                "mode": "red/blue/gold",
+                "duration": int (분),
+                "reason": str,
+                "target_regions": [str],
+                "intensity": int (0-100, 향후 BLE 제어용)
+            }
+        """
+        regions = analysis_results.get("regions", {})
+        overall_score = analysis_results.get("overall_score", 75)
+
+        # 1. 부위별 문제 점수 집계
+        issue_scores = {
+            "wrinkle": 0,
+            "elasticity": 0,
+            "pigmentation": 0,
+            "acne": 0,
+            "pore": 0
+        }
+
+        weak_regions = []
+
+        for region_name, data in regions.items():
+            score = data.get("score", 75)
+            if score < 70:
+                weak_regions.append(region_name)
+
+            # 부위별 특성에 따라 문제 유형 가중치 부여
+            if region_name in ["forehead", "eye_l", "eye_r"]:
+                issue_scores["wrinkle"] += (100 - score) * 0.3
+                issue_scores["elasticity"] += (100 - score) * 0.2
+            elif region_name in ["cheek_l", "cheek_r"]:
+                issue_scores["pore"] += (100 - score) * 0.25
+                issue_scores["pigmentation"] += (100 - score) * 0.2
+            elif region_name == "chin":
+                issue_scores["acne"] += (100 - score) * 0.3
+
+        # 2. 가장 심각한 문제 찾기
+        main_issue = max(issue_scores, key=issue_scores.get)
+        issue_severity = issue_scores[main_issue]
+
+        # 3. LED 모드 선택
+        if main_issue in ["acne", "pore"]:
+            mode = "blue"
+            reason = "모공 및 피지 문제 집중 케어"
+        elif main_issue in ["wrinkle", "elasticity"]:
+            mode = "red"
+            reason = "주름 및 탄력 개선 집중"
+        else:
+            mode = "gold"
+            reason = "색소 침착 및 피부톤 개선"
+
+        # 4. 시간 조정 (문제가 심각할수록 길게)
+        if issue_severity > 40:
+            duration = 25
+        elif issue_severity > 25:
+            duration = 20
+        else:
+            duration = 15
+
+        # 5. 강도 계산 (향후 BLE PWM 제어용)
+        intensity = min(100, max(50, int(issue_severity * 1.5)))
+
+        return {
+            "mode": mode,
+            "duration": duration,
+            "reason": reason,
+            "target_regions": weak_regions,
+            "intensity": intensity,
+            "ble_command": f"START:{mode.upper()}:{duration}",  # Xiao BLE 전송용 명령어 (확장 가능)
+            "issue_analysis": {k: round(v, 2) for k, v in issue_scores.items()}
+        }
+
+    @staticmethod
+    def get_device_config():
+        """
+        Seeed Xiao BLE 디바이스 설정 반환 (향후 확장용)
+        """
+        return {
+            "device_name": "MySkin_LED_Mask",
+            "ble_service_uuid": "0000ffe0-0000-1000-8000-00805f9b34fb",
+            "supported_modes": list(LEDRecommendationEngine.LED_MODES.keys()),
+            "pwm_range": [0, 255],
+            "firmware_version": "1.0.0"  # 향후 펌웨어 버전 체크용
+        }
+
+# ==========================================
+# 3. 서버 API
+# ==========================================
+@app.route('/')
+def home():
+    return render_template('index.html')
+
+def is_valid_face_image(image):
+    """
+    얼굴 이미지 유효성 검사 - MediaPipe Face Detection 사용 (v0.10+ New API)
+
+    Args:
+        image: PIL Image 객체 (RGB)
+
+    Returns:
+        (bool, str): (유효 여부, 실패 이유)
+    """
+    print("\n   🔍 [이미지 검증 시작]")
+
+    try:
+        # 1. 이미지 크기 확인
+        width, height = image.size
+        print(f"   📏 이미지 크기: {width}x{height}")
+        if width < 100 or height < 100:
+            return False, "이미지가 너무 작습니다 (최소 100x100)"
+
+        # 2. 이미지를 numpy 배열로 변환 (RGB)
+        img_array = np.array(image, dtype=np.uint8)
+
+        # 3. 밝기 확인
+        mean_brightness = np.mean(img_array)
+        print(f"   💡 평균 밝기: {mean_brightness:.1f}")
+
+        if mean_brightness < 20:
+            return False, "이미지가 너무 어둡습니다"
+        if mean_brightness > 235:
+            return False, "이미지가 너무 밝습니다"
+
+        print("   ✅ 이미지 검증 통과")
+        return True, "OK"
+
+    except Exception as e:
+        print(f"❌ 이미지 검증 오류: {e}")
+        import traceback
+        traceback.print_exc()
+        return False, f"이미지 검증 중 오류가 발생했습니다: {str(e)}"
+
+
+@app.route('/api/v1/analysis/face', methods=['POST'])
+def analyze_face():
+    if 'file' not in request.files:
+        return jsonify({"error": "No file"}), 400
+
+    file = request.files['file']
+    user_id = request.form.get('user_id', 'anonymous')
+
+    try:
+        # 1. 이미지 읽기
+        image_bytes = file.read()
+        original_image = Image.open(io.BytesIO(image_bytes)).convert('RGB')
+        input_tensor = transform(original_image).unsqueeze(0)
+
+        print("\n" + "="*50)
+        print(f"📸 [AI 분석 시작] 사용자: {user_id} | 이미지: {original_image.size}")
+        print("="*50)
+
+        # 2. 얼굴 유효성 검사 (MediaPipe)
+        is_valid, reason = is_valid_face_image(original_image)
+        if not is_valid:
+            print(f"❌ 얼굴 검증 실패: {reason}")
+            return jsonify({
+                "error": "invalid_image",
+                "message": reason,
+                "details": "얼굴이 포함된 사진을 업로드해주세요."
+            }), 400
+
+        print("✅ 얼굴 검증 통과")
+
+        results = {}
+        total_grade_sum = 0
+        count = 0
+
+        # 정의된 모든 부위를 순회
+        for region_name, config in MODEL_CONFIGS.items():
+            if region_name in loaded_models:
+                with torch.no_grad():
+                    # AI 모델 실행
+                    cls_out, reg_out = loaded_models[region_name](input_tensor)
+
+                    # --- [검증 1] Classification (등급) ---
+                    probs = torch.softmax(cls_out, dim=1)
+                    _, predicted_idx = torch.max(cls_out, 1)
+                    grade = predicted_idx.item() + 1
+
+                    # --- [검증 2] Regression (상세 수치) ---
+                    reg_values = reg_out[0].tolist()
+
+                    # 터미널에 로그 찍기
+                    print(f"🔎 [{region_name.upper()}] 분석 결과")
+                    print(f"   - 등급(Class): {grade}등급 (확률: {probs[0].tolist()})")
+                    print(f"   - 예측수치({len(reg_values)}개): {[round(x, 3) for x in reg_values]}")
+
+                    # 점수 변환 (UI 표시용) - 개선된 알고리즘
+                    max_grade = config["num_classes"]
+
+                    # 1. 기본 점수 계산 (등급 기반)
+                    base_score = ((max_grade - grade + 1) / max_grade) * 100
+
+                    # 2. Regression 값을 활용하여 세밀한 점수 조정
+                    # 주요 지표(상위 5개)의 평균을 보정값으로 사용
+                    if len(reg_values) > 0:
+                        # 0-10 범위를 가정하고 정규화
+                        normalized_metrics = [max(0, min(10, abs(val))) for val in reg_values[:5]]
+                        avg_metric = sum(normalized_metrics) / len(normalized_metrics) if normalized_metrics else 5
+
+                        # 보정값: -10 ~ +10 범위
+                        adjustment = (avg_metric - 5) * 2  # 5가 중간값
+                    else:
+                        adjustment = 0
+
+                    # 3. 최종 점수 (소수점 포함, 반올림)
+                    score = round(max(0, min(100, base_score + adjustment)))
+                    chart_grade = max(1, min(10, int(score / 10)))
+
+                    # 상세 메트릭 파싱
+                    detailed_metrics = parse_regression_values(region_name, reg_values)
+
+                    results[region_name] = {
+                        "grade": chart_grade,
+                        "raw_grade": grade,
+                        "score": score,
+                        "details": reg_values,
+                        "metrics": detailed_metrics  # 새로 추가된 상세 분석
+                    }
+                    total_grade_sum += score
+                    count += 1
+            else:
+                print(f"⚠️ [{region_name}] 모델이 로드되지 않았습니다.")
+                results[region_name] = {"grade": 5, "score": 50, "metrics": {}}
+
+        overall_score = int(total_grade_sum / count) if count > 0 else 0
+
+        # AI 기반 LED 솔루션 추천
+        analysis_data = {
+            "overall_score": overall_score,
+            "regions": results
+        }
+        recommendation = LEDRecommendationEngine.recommend(analysis_data)
+
+        print("="*50)
+        print(f"✅ 분석 완료! 종합 점수: {overall_score}")
+        print(f"💡 추천 솔루션: {recommendation['mode'].upper()} 모드 ({recommendation['duration']}분)")
+        print(f"   이유: {recommendation['reason']}")
+        print("="*50 + "\n")
+
+        response_data = {
+            "overall_score": overall_score,
+            "regions": results,
+            "recommendation": recommendation,  # AI 추천 추가
+            "timestamp": datetime.now().isoformat()
+        }
+
+        return jsonify(response_data)
+
+    except Exception as e:
+        print(f"❌ 치명적 오류 발생: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+
+# ==========================================
+# 히스토리 관리 API
+# ==========================================
+@app.route('/api/v1/history', methods=['POST'])
+def save_history():
+    """분석 결과를 히스토리에 저장 (PostgreSQL)"""
+    db = get_db()
+    try:
+        data = request.get_json()
+        user_id = data.get('user_id', 'anonymous')
+
+        # 필수 필드 확인
+        if 'overall_score' not in data or 'regions' not in data:
+            return jsonify({"error": "Missing required fields"}), 400
+
+        # 새 기록 생성
+        new_record = AnalysisHistory(
+            user_id=user_id,
+            timestamp=datetime.fromisoformat(data.get('timestamp', datetime.now().isoformat()).replace('Z', '+00:00')) if isinstance(data.get('timestamp'), str) else datetime.now(),
+            overall_score=data['overall_score'],
+            regions=data['regions'],
+            recommendation=data.get('recommendation', {}),
+            course_name=data.get('course_name', 'AI 정밀 분석')
+        )
+
+        db.add(new_record)
+        db.commit()
+        db.refresh(new_record)
+
+        print(f"📝 히스토리 저장 완료: {user_id} - 점수 {data['overall_score']}")
+
+        return jsonify({
+            "success": True,
+            "record_id": new_record.id,
+            "message": "히스토리가 저장되었습니다."
+        })
+
+    except Exception as e:
+        db.rollback()
+        print(f"❌ 히스토리 저장 오류: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        db.close()
+
+
+@app.route('/api/v1/history/<user_id>', methods=['GET'])
+def get_history(user_id):
+    """사용자별 히스토리 조회 (PostgreSQL)"""
+    db = get_db()
+    try:
+        # 최대 개수 제한 (선택적)
+        limit = request.args.get('limit', type=int, default=20)
+
+        # 데이터베이스에서 조회 (최신순)
+        records = db.query(AnalysisHistory)\
+            .filter(AnalysisHistory.user_id == user_id)\
+            .order_by(AnalysisHistory.timestamp.desc())\
+            .limit(limit)\
+            .all()
+
+        # 딕셔너리로 변환
+        user_history = [record.to_dict() for record in records]
+
+        return jsonify({
+            "user_id": user_id,
+            "total_records": len(user_history),
+            "history": user_history
+        })
+
+    except Exception as e:
+        print(f"❌ 히스토리 조회 오류: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        db.close()
+
+
+# ==========================================
+# 사용자 프로필 관리 API
+# ==========================================
+@app.route('/api/v1/user/profile', methods=['POST'])
+def save_user_profile():
+    """사용자 프로필 생성/수정 (PostgreSQL)"""
+    db = get_db()
+    try:
+        data = request.get_json()
+        user_id = data.get('user_id')
+
+        if not user_id:
+            return jsonify({"error": "user_id is required"}), 400
+
+        # 기존 사용자 조회
+        existing_user = db.query(User).filter(User.user_id == user_id).first()
+
+        if existing_user:
+            # 업데이트
+            existing_user.name = data.get('name', existing_user.name)
+            existing_user.skin_type = data.get('skin_type', existing_user.skin_type)
+            existing_user.concerns = data.get('concerns', existing_user.concerns)
+            existing_user.goals = data.get('goals', existing_user.goals)
+            existing_user.updated_at = datetime.now()
+
+            db.commit()
+            db.refresh(existing_user)
+            profile = existing_user.to_dict()
+        else:
+            # 새 사용자 생성
+            new_user = User(
+                user_id=user_id,
+                name=data.get('name', ''),
+                skin_type=data.get('skin_type', ''),
+                concerns=data.get('concerns', []),
+                goals=data.get('goals', '')
+            )
+            db.add(new_user)
+            db.commit()
+            db.refresh(new_user)
+            profile = new_user.to_dict()
+
+        print(f"👤 프로필 저장 완료: {user_id} - {profile.get('name', 'N/A')}")
+
+        return jsonify({
+            "success": True,
+            "profile": profile
+        })
+
+    except Exception as e:
+        db.rollback()
+        print(f"❌ 프로필 저장 오류: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        db.close()
+
+
+@app.route('/api/v1/user/profile/<user_id>', methods=['GET'])
+def get_user_profile(user_id):
+    """사용자 프로필 조회 (PostgreSQL)"""
+    db = get_db()
+    try:
+        user = db.query(User).filter(User.user_id == user_id).first()
+
+        if not user:
+            return jsonify({
+                "user_id": user_id,
+                "profile": None,
+                "message": "프로필이 존재하지 않습니다."
+            }), 404
+
+        return jsonify({
+            "user_id": user_id,
+            "profile": user.to_dict()
+        })
+
+    except Exception as e:
+        print(f"❌ 프로필 조회 오류: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        db.close()
+
+
+# ==========================================
+# 통계 API
+# ==========================================
+@app.route('/api/v1/stats/<user_id>', methods=['GET'])
+def get_user_stats(user_id):
+    """사용자 통계 (평균 점수, 개선 추이 등) (PostgreSQL)"""
+    db = get_db()
+    try:
+        # 사용자 기록 조회 (최신순)
+        records = db.query(AnalysisHistory)\
+            .filter(AnalysisHistory.user_id == user_id)\
+            .order_by(AnalysisHistory.timestamp.desc())\
+            .all()
+
+        if not records:
+            return jsonify({
+                "user_id": user_id,
+                "message": "분석 기록이 없습니다."
+            }), 404
+
+        # 통계 계산
+        scores = [r.overall_score for r in records]
+
+        # 최근 7개 기록으로 추세 계산
+        recent_scores = scores[:7]
+        trend = "improving" if len(recent_scores) >= 2 and recent_scores[0] > recent_scores[-1] else "stable"
+
+        # 부위별 평균 점수
+        region_stats = {}
+        for region in ["forehead", "eye_l", "eye_r", "cheek_l", "cheek_r", "chin"]:
+            region_scores = [
+                r.regions[region]['score']
+                for r in records
+                if r.regions and region in r.regions
+            ]
+            if region_scores:
+                region_stats[region] = {
+                    "average": round(sum(region_scores) / len(region_scores), 2),
+                    "latest": region_scores[0],
+                    "best": max(region_scores)
+                }
+
+        stats = {
+            "user_id": user_id,
+            "total_analyses": len(records),
+            "average_score": round(sum(scores) / len(scores), 2) if scores else 0,
+            "latest_score": scores[0] if scores else 0,
+            "best_score": max(scores) if scores else 0,
+            "trend": trend,
+            "improvement": round(scores[0] - scores[-1], 2) if len(scores) >= 2 else 0,
+            "region_stats": region_stats,
+            "recent_scores": recent_scores
+        }
+
+        return jsonify(stats)
+
+    except Exception as e:
+        print(f"❌ 통계 조회 오류: {e}")
+        import traceback
+        traceback.print_exc()
+        return jsonify({"error": str(e)}), 500
+    finally:
+        db.close()
+
+
+# ==========================================
+# BLE 디바이스 설정 API (Seeed Xiao BLE용)
+# ==========================================
+@app.route('/api/v1/device/config', methods=['GET'])
+def get_device_config():
+    """Seeed Xiao BLE 디바이스 설정 반환"""
+    config = LEDRecommendationEngine.get_device_config()
+    return jsonify(config)
+
+
+@app.route('/api/v1/device/modes', methods=['GET'])
+def get_led_modes():
+    """사용 가능한 LED 모드 정보 반환"""
+    return jsonify({
+        "modes": LEDRecommendationEngine.LED_MODES,
+        "description": "각 LED 모드별 파장과 효과 정보"
+    })
+
+
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)

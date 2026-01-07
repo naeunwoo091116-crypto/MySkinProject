@@ -1,0 +1,10 @@
+flask
+torch
+torchvision
+pillow
+flask-cors
+sqlalchemy
+psycopg2-binary
+python-dotenv
+bleak
+pyserial
