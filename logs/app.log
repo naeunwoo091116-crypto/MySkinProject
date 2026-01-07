@@ -1943,3 +1943,350 @@
 2026-01-06 18:30:34 - services.history_service - INFO - 📝 히스토리 저장 완료: user_ho0w9vty1 - 점수 84.3
 2026-01-06 18:31:04 - services.serial_service - INFO - 명령 전송: START:RED:15
 2026-01-06 18:31:05 - services.serial_service - INFO - 아두이노 응답: OK
+2026-01-07 12:26:04 - services.ai_service - INFO - --- AI 모델 로딩 시작 ---
+2026-01-07 12:26:04 - services.ai_service - INFO - 🔄 로딩 중: forehead (Class:4, Reg:15)
+2026-01-07 12:26:04 - services.ai_service - INFO - ✅ forehead 로드 성공!
+2026-01-07 12:26:04 - services.ai_service - INFO - 🔄 로딩 중: eye_l (Class:4, Reg:8)
+2026-01-07 12:26:04 - services.ai_service - INFO - ✅ eye_l 로드 성공!
+2026-01-07 12:26:04 - services.ai_service - INFO - 🔄 로딩 중: eye_r (Class:4, Reg:8)
+2026-01-07 12:26:04 - services.ai_service - INFO - ✅ eye_r 로드 성공!
+2026-01-07 12:26:04 - services.ai_service - INFO - 🔄 로딩 중: cheek_l (Class:4, Reg:16)
+2026-01-07 12:26:04 - services.ai_service - INFO - ✅ cheek_l 로드 성공!
+2026-01-07 12:26:04 - services.ai_service - INFO - 🔄 로딩 중: cheek_r (Class:4, Reg:16)
+2026-01-07 12:26:05 - services.ai_service - INFO - ✅ cheek_r 로드 성공!
+2026-01-07 12:26:05 - services.ai_service - INFO - 🔄 로딩 중: chin (Class:4, Reg:15)
+2026-01-07 12:26:05 - services.ai_service - INFO - ✅ chin 로드 성공!
+2026-01-07 12:26:05 - services.ai_service - INFO - 총 6개 모델 로드 완료
+2026-01-07 12:26:11 - services.ai_service - INFO - --- AI 모델 로딩 시작 ---
+2026-01-07 12:26:11 - services.ai_service - INFO - 🔄 로딩 중: forehead (Class:4, Reg:15)
+2026-01-07 12:26:11 - services.ai_service - INFO - ✅ forehead 로드 성공!
+2026-01-07 12:26:11 - services.ai_service - INFO - 🔄 로딩 중: eye_l (Class:4, Reg:8)
+2026-01-07 12:26:11 - services.ai_service - INFO - ✅ eye_l 로드 성공!
+2026-01-07 12:26:11 - services.ai_service - INFO - 🔄 로딩 중: eye_r (Class:4, Reg:8)
+2026-01-07 12:26:12 - services.ai_service - INFO - ✅ eye_r 로드 성공!
+2026-01-07 12:26:12 - services.ai_service - INFO - 🔄 로딩 중: cheek_l (Class:4, Reg:16)
+2026-01-07 12:26:12 - services.ai_service - INFO - ✅ cheek_l 로드 성공!
+2026-01-07 12:26:12 - services.ai_service - INFO - 🔄 로딩 중: cheek_r (Class:4, Reg:16)
+2026-01-07 12:26:12 - services.ai_service - INFO - ✅ cheek_r 로드 성공!
+2026-01-07 12:26:12 - services.ai_service - INFO - 🔄 로딩 중: chin (Class:4, Reg:15)
+2026-01-07 12:26:12 - services.ai_service - INFO - ✅ chin 로드 성공!
+2026-01-07 12:26:12 - services.ai_service - INFO - 총 6개 모델 로드 완료
+2026-01-07 12:26:24 - services.serial_service - INFO - 시리얼 포트 스캔 시작
+2026-01-07 12:26:24 - services.serial_service - INFO - 발견된 포트: COM7 - USB 직렬 장치(COM7)
+2026-01-07 12:26:24 - services.serial_service - INFO - 1개의 시리얼 포트 발견
+2026-01-07 12:26:24 - services.serial_service - INFO - 첫 번째 포트 선택: COM7
+2026-01-07 12:26:24 - services.serial_service - INFO - 시리얼 포트 연결 시도: COM7 @ 115200 baud
+2026-01-07 12:26:24 - services.serial_service - ERROR - 시리얼 포트 연결 실패: could not open port 'COM7': PermissionError(13, '액세스가 거부되었습니다.', None, 5)
+2026-01-07 12:26:29 - services.serial_service - INFO - 시리얼 포트 스캔 시작
+2026-01-07 12:26:29 - services.serial_service - INFO - 발견된 포트: COM7 - USB 직렬 장치(COM7)
+2026-01-07 12:26:29 - services.serial_service - INFO - 1개의 시리얼 포트 발견
+2026-01-07 12:26:29 - services.serial_service - INFO - 첫 번째 포트 선택: COM7
+2026-01-07 12:26:29 - services.serial_service - INFO - 시리얼 포트 연결 시도: COM7 @ 115200 baud
+2026-01-07 12:26:29 - services.serial_service - ERROR - 시리얼 포트 연결 실패: could not open port 'COM7': PermissionError(13, '액세스가 거부되었습니다.', None, 5)
+2026-01-07 12:26:33 - services.serial_service - INFO - 시리얼 포트 스캔 시작
+2026-01-07 12:26:33 - services.serial_service - INFO - 발견된 포트: COM7 - USB 직렬 장치(COM7)
+2026-01-07 12:26:33 - services.serial_service - INFO - 1개의 시리얼 포트 발견
+2026-01-07 12:26:33 - services.serial_service - INFO - 첫 번째 포트 선택: COM7
+2026-01-07 12:26:33 - services.serial_service - INFO - 시리얼 포트 연결 시도: COM7 @ 115200 baud
+2026-01-07 12:26:33 - services.serial_service - ERROR - 시리얼 포트 연결 실패: could not open port 'COM7': PermissionError(13, '액세스가 거부되었습니다.', None, 5)
+2026-01-07 12:26:39 - services.serial_service - INFO - 시리얼 포트 스캔 시작
+2026-01-07 12:26:39 - services.serial_service - INFO - 발견된 포트: COM7 - USB 직렬 장치(COM7)
+2026-01-07 12:26:39 - services.serial_service - INFO - 1개의 시리얼 포트 발견
+2026-01-07 12:26:39 - services.serial_service - INFO - 첫 번째 포트 선택: COM7
+2026-01-07 12:26:39 - services.serial_service - INFO - 시리얼 포트 연결 시도: COM7 @ 115200 baud
+2026-01-07 12:26:39 - services.serial_service - ERROR - 시리얼 포트 연결 실패: could not open port 'COM7': PermissionError(13, '액세스가 거부되었습니다.', None, 5)
+2026-01-07 12:26:47 - services.serial_service - INFO - 시리얼 포트 스캔 시작
+2026-01-07 12:26:47 - services.serial_service - INFO - 발견된 포트: COM7 - USB 직렬 장치(COM7)
+2026-01-07 12:26:47 - services.serial_service - INFO - 1개의 시리얼 포트 발견
+2026-01-07 12:26:47 - services.serial_service - INFO - 첫 번째 포트 선택: COM7
+2026-01-07 12:26:47 - services.serial_service - INFO - 시리얼 포트 연결 시도: COM7 @ 115200 baud
+2026-01-07 12:26:47 - services.serial_service - ERROR - 시리얼 포트 연결 실패: could not open port 'COM7': PermissionError(13, '액세스가 거부되었습니다.', None, 5)
+2026-01-07 12:30:33 - services.ai_service - INFO - --- AI 모델 로딩 시작 ---
+2026-01-07 12:30:33 - services.ai_service - INFO - 🔄 로딩 중: forehead (Class:4, Reg:15)
+2026-01-07 12:30:33 - services.ai_service - INFO - ✅ forehead 로드 성공!
+2026-01-07 12:30:33 - services.ai_service - INFO - 🔄 로딩 중: eye_l (Class:4, Reg:8)
+2026-01-07 12:30:33 - services.ai_service - INFO - ✅ eye_l 로드 성공!
+2026-01-07 12:30:33 - services.ai_service - INFO - 🔄 로딩 중: eye_r (Class:4, Reg:8)
+2026-01-07 12:30:33 - services.ai_service - INFO - ✅ eye_r 로드 성공!
+2026-01-07 12:30:33 - services.ai_service - INFO - 🔄 로딩 중: cheek_l (Class:4, Reg:16)
+2026-01-07 12:30:33 - services.ai_service - INFO - ✅ cheek_l 로드 성공!
+2026-01-07 12:30:33 - services.ai_service - INFO - 🔄 로딩 중: cheek_r (Class:4, Reg:16)
+2026-01-07 12:30:33 - services.ai_service - INFO - ✅ cheek_r 로드 성공!
+2026-01-07 12:30:33 - services.ai_service - INFO - 🔄 로딩 중: chin (Class:4, Reg:15)
+2026-01-07 12:30:34 - services.ai_service - INFO - ✅ chin 로드 성공!
+2026-01-07 12:30:34 - services.ai_service - INFO - 총 6개 모델 로드 완료
+2026-01-07 12:30:40 - services.ai_service - INFO - --- AI 모델 로딩 시작 ---
+2026-01-07 12:30:40 - services.ai_service - INFO - 🔄 로딩 중: forehead (Class:4, Reg:15)
+2026-01-07 12:30:40 - services.ai_service - INFO - ✅ forehead 로드 성공!
+2026-01-07 12:30:40 - services.ai_service - INFO - 🔄 로딩 중: eye_l (Class:4, Reg:8)
+2026-01-07 12:30:40 - services.ai_service - INFO - ✅ eye_l 로드 성공!
+2026-01-07 12:30:40 - services.ai_service - INFO - 🔄 로딩 중: eye_r (Class:4, Reg:8)
+2026-01-07 12:30:40 - services.ai_service - INFO - ✅ eye_r 로드 성공!
+2026-01-07 12:30:40 - services.ai_service - INFO - 🔄 로딩 중: cheek_l (Class:4, Reg:16)
+2026-01-07 12:30:40 - services.ai_service - INFO - ✅ cheek_l 로드 성공!
+2026-01-07 12:30:40 - services.ai_service - INFO - 🔄 로딩 중: cheek_r (Class:4, Reg:16)
+2026-01-07 12:30:40 - services.ai_service - INFO - ✅ cheek_r 로드 성공!
+2026-01-07 12:30:40 - services.ai_service - INFO - 🔄 로딩 중: chin (Class:4, Reg:15)
+2026-01-07 12:30:41 - services.ai_service - INFO - ✅ chin 로드 성공!
+2026-01-07 12:30:41 - services.ai_service - INFO - 총 6개 모델 로드 완료
+2026-01-07 12:30:51 - services.serial_service - INFO - 시리얼 포트 스캔 시작
+2026-01-07 12:30:51 - services.serial_service - INFO - 발견된 포트: COM7 - USB 직렬 장치(COM7)
+2026-01-07 12:30:51 - services.serial_service - INFO - 1개의 시리얼 포트 발견
+2026-01-07 12:30:51 - services.serial_service - INFO - 첫 번째 포트 선택: COM7
+2026-01-07 12:30:51 - services.serial_service - INFO - 시리얼 포트 연결 시도: COM7 @ 115200 baud
+2026-01-07 12:30:53 - services.serial_service - INFO - 시리얼 포트 연결 성공: COM7
+2026-01-07 12:31:04 - services.serial_service - INFO - 명령 전송: START:RED:15
+2026-01-07 12:31:04 - services.serial_service - INFO - 아두이노 응답: Serial command received: START:RED:15
+2026-01-07 12:31:07 - services.serial_service - INFO - 명령 전송: STOP
+2026-01-07 12:31:07 - services.serial_service - INFO - 아두이노 응답: Starting therapy: RED for 15 minutes
+2026-01-07 12:31:30 - services.serial_service - INFO - 명령 전송: START:RED:15
+2026-01-07 12:31:31 - services.serial_service - INFO - 아두이노 응답: LED Color set to R:255 G:0 B:0
+2026-01-07 12:31:37 - services.serial_service - INFO - 명령 전송: STOP
+2026-01-07 12:31:38 - services.serial_service - INFO - 아두이노 응답: OK:STARTED:RED:15
+2026-01-07 12:31:39 - services.serial_service - INFO - 명령 전송: START:RED:15
+2026-01-07 12:31:40 - services.serial_service - INFO - 아두이노 응답: Serial command received: STOP
+2026-01-07 12:31:40 - services.serial_service - INFO - 명령 전송: STOP
+2026-01-07 12:31:40 - services.serial_service - INFO - 아두이노 응답: Stopping therapy
+2026-01-07 13:01:46 - services.ai_service - INFO - --- AI 모델 로딩 시작 ---
+2026-01-07 13:01:46 - services.ai_service - INFO - 🔄 로딩 중: forehead (Class:4, Reg:15)
+2026-01-07 13:01:47 - services.ai_service - INFO - ✅ forehead 로드 성공!
+2026-01-07 13:01:47 - services.ai_service - INFO - 🔄 로딩 중: eye_l (Class:4, Reg:8)
+2026-01-07 13:01:47 - services.ai_service - INFO - ✅ eye_l 로드 성공!
+2026-01-07 13:01:47 - services.ai_service - INFO - 🔄 로딩 중: eye_r (Class:4, Reg:8)
+2026-01-07 13:01:47 - services.ai_service - INFO - ✅ eye_r 로드 성공!
+2026-01-07 13:01:47 - services.ai_service - INFO - 🔄 로딩 중: cheek_l (Class:4, Reg:16)
+2026-01-07 13:01:47 - services.ai_service - INFO - ✅ cheek_l 로드 성공!
+2026-01-07 13:01:47 - services.ai_service - INFO - 🔄 로딩 중: cheek_r (Class:4, Reg:16)
+2026-01-07 13:01:47 - services.ai_service - INFO - ✅ cheek_r 로드 성공!
+2026-01-07 13:01:47 - services.ai_service - INFO - 🔄 로딩 중: chin (Class:4, Reg:15)
+2026-01-07 13:01:48 - services.ai_service - INFO - ✅ chin 로드 성공!
+2026-01-07 13:01:48 - services.ai_service - INFO - 총 6개 모델 로드 완료
+2026-01-07 13:01:54 - services.ai_service - INFO - --- AI 모델 로딩 시작 ---
+2026-01-07 13:01:54 - services.ai_service - INFO - 🔄 로딩 중: forehead (Class:4, Reg:15)
+2026-01-07 13:01:54 - services.ai_service - INFO - ✅ forehead 로드 성공!
+2026-01-07 13:01:54 - services.ai_service - INFO - 🔄 로딩 중: eye_l (Class:4, Reg:8)
+2026-01-07 13:01:54 - services.ai_service - INFO - ✅ eye_l 로드 성공!
+2026-01-07 13:01:54 - services.ai_service - INFO - 🔄 로딩 중: eye_r (Class:4, Reg:8)
+2026-01-07 13:01:54 - services.ai_service - INFO - ✅ eye_r 로드 성공!
+2026-01-07 13:01:54 - services.ai_service - INFO - 🔄 로딩 중: cheek_l (Class:4, Reg:16)
+2026-01-07 13:01:55 - services.ai_service - INFO - ✅ cheek_l 로드 성공!
+2026-01-07 13:01:55 - services.ai_service - INFO - 🔄 로딩 중: cheek_r (Class:4, Reg:16)
+2026-01-07 13:01:55 - services.ai_service - INFO - ✅ cheek_r 로드 성공!
+2026-01-07 13:01:55 - services.ai_service - INFO - 🔄 로딩 중: chin (Class:4, Reg:15)
+2026-01-07 13:01:55 - services.ai_service - INFO - ✅ chin 로드 성공!
+2026-01-07 13:01:55 - services.ai_service - INFO - 총 6개 모델 로드 완료
+2026-01-07 13:02:07 - services.serial_service - INFO - 시리얼 포트 스캔 시작
+2026-01-07 13:02:07 - services.serial_service - INFO - 발견된 포트: COM7 - USB 직렬 장치(COM7)
+2026-01-07 13:02:07 - services.serial_service - INFO - 1개의 시리얼 포트 발견
+2026-01-07 13:02:07 - services.serial_service - INFO - 첫 번째 포트 선택: COM7
+2026-01-07 13:02:07 - services.serial_service - INFO - 시리얼 포트 연결 시도: COM7 @ 115200 baud
+2026-01-07 13:02:07 - services.serial_service - ERROR - 시리얼 포트 연결 실패: could not open port 'COM7': PermissionError(13, '액세스가 거부되었습니다.', None, 5)
+2026-01-07 13:02:38 - services.ai_service - INFO - --- AI 모델 로딩 시작 ---
+2026-01-07 13:02:38 - services.ai_service - INFO - 🔄 로딩 중: forehead (Class:4, Reg:15)
+2026-01-07 13:02:38 - services.ai_service - INFO - ✅ forehead 로드 성공!
+2026-01-07 13:02:38 - services.ai_service - INFO - 🔄 로딩 중: eye_l (Class:4, Reg:8)
+2026-01-07 13:02:38 - services.ai_service - INFO - ✅ eye_l 로드 성공!
+2026-01-07 13:02:38 - services.ai_service - INFO - 🔄 로딩 중: eye_r (Class:4, Reg:8)
+2026-01-07 13:02:38 - services.ai_service - INFO - ✅ eye_r 로드 성공!
+2026-01-07 13:02:38 - services.ai_service - INFO - 🔄 로딩 중: cheek_l (Class:4, Reg:16)
+2026-01-07 13:02:38 - services.ai_service - INFO - ✅ cheek_l 로드 성공!
+2026-01-07 13:02:38 - services.ai_service - INFO - 🔄 로딩 중: cheek_r (Class:4, Reg:16)
+2026-01-07 13:02:39 - services.ai_service - INFO - ✅ cheek_r 로드 성공!
+2026-01-07 13:02:39 - services.ai_service - INFO - 🔄 로딩 중: chin (Class:4, Reg:15)
+2026-01-07 13:02:39 - services.ai_service - INFO - ✅ chin 로드 성공!
+2026-01-07 13:02:39 - services.ai_service - INFO - 총 6개 모델 로드 완료
+2026-01-07 13:02:45 - services.ai_service - INFO - --- AI 모델 로딩 시작 ---
+2026-01-07 13:02:45 - services.ai_service - INFO - 🔄 로딩 중: forehead (Class:4, Reg:15)
+2026-01-07 13:02:45 - services.ai_service - INFO - ✅ forehead 로드 성공!
+2026-01-07 13:02:45 - services.ai_service - INFO - 🔄 로딩 중: eye_l (Class:4, Reg:8)
+2026-01-07 13:02:45 - services.ai_service - INFO - ✅ eye_l 로드 성공!
+2026-01-07 13:02:45 - services.ai_service - INFO - 🔄 로딩 중: eye_r (Class:4, Reg:8)
+2026-01-07 13:02:45 - services.ai_service - INFO - ✅ eye_r 로드 성공!
+2026-01-07 13:02:45 - services.ai_service - INFO - 🔄 로딩 중: cheek_l (Class:4, Reg:16)
+2026-01-07 13:02:45 - services.ai_service - INFO - ✅ cheek_l 로드 성공!
+2026-01-07 13:02:45 - services.ai_service - INFO - 🔄 로딩 중: cheek_r (Class:4, Reg:16)
+2026-01-07 13:02:46 - services.ai_service - INFO - ✅ cheek_r 로드 성공!
+2026-01-07 13:02:46 - services.ai_service - INFO - 🔄 로딩 중: chin (Class:4, Reg:15)
+2026-01-07 13:02:46 - services.ai_service - INFO - ✅ chin 로드 성공!
+2026-01-07 13:02:46 - services.ai_service - INFO - 총 6개 모델 로드 완료
+2026-01-07 13:02:56 - services.serial_service - INFO - 시리얼 포트 스캔 시작
+2026-01-07 13:02:56 - services.serial_service - INFO - 발견된 포트: COM7 - USB 직렬 장치(COM7)
+2026-01-07 13:02:56 - services.serial_service - INFO - 1개의 시리얼 포트 발견
+2026-01-07 13:02:56 - services.serial_service - INFO - 첫 번째 포트 선택: COM7
+2026-01-07 13:02:56 - services.serial_service - INFO - 시리얼 포트 연결 시도: COM7 @ 115200 baud
+2026-01-07 13:02:58 - services.serial_service - INFO - 시리얼 포트 연결 성공: COM7
+2026-01-07 13:03:01 - services.serial_service - INFO - 명령 전송: START:RED:15
+2026-01-07 13:03:01 - services.serial_service - INFO - 아두이노 응답: Serial command received: START:RED:15
+2026-01-07 13:03:06 - services.serial_service - INFO - 명령 전송: STOP
+2026-01-07 13:03:06 - services.serial_service - INFO - 아두이노 응답: Starting therapy: RED for 15 minutes
+2026-01-07 13:03:15 - services.serial_service - INFO - 명령 전송: START:BLUE:15
+2026-01-07 13:03:16 - services.serial_service - INFO - 아두이노 응답: LED Color set to R:255 G:0 B:0
+2026-01-07 14:54:48 - services.ai_service - INFO - --- AI 모델 로딩 시작 ---
+2026-01-07 14:54:48 - services.ai_service - INFO - 🔄 로딩 중: forehead (Class:4, Reg:15)
+2026-01-07 14:54:49 - services.ai_service - INFO - ✅ forehead 로드 성공!
+2026-01-07 14:54:49 - services.ai_service - INFO - 🔄 로딩 중: eye_l (Class:4, Reg:8)
+2026-01-07 14:54:49 - services.ai_service - INFO - ✅ eye_l 로드 성공!
+2026-01-07 14:54:49 - services.ai_service - INFO - 🔄 로딩 중: eye_r (Class:4, Reg:8)
+2026-01-07 14:54:49 - services.ai_service - INFO - ✅ eye_r 로드 성공!
+2026-01-07 14:54:49 - services.ai_service - INFO - 🔄 로딩 중: cheek_l (Class:4, Reg:16)
+2026-01-07 14:54:49 - services.ai_service - INFO - ✅ cheek_l 로드 성공!
+2026-01-07 14:54:49 - services.ai_service - INFO - 🔄 로딩 중: cheek_r (Class:4, Reg:16)
+2026-01-07 14:54:49 - services.ai_service - INFO - ✅ cheek_r 로드 성공!
+2026-01-07 14:54:49 - services.ai_service - INFO - 🔄 로딩 중: chin (Class:4, Reg:15)
+2026-01-07 14:54:49 - services.ai_service - INFO - ✅ chin 로드 성공!
+2026-01-07 14:54:49 - services.ai_service - INFO - 총 6개 모델 로드 완료
+2026-01-07 14:54:56 - services.ai_service - INFO - --- AI 모델 로딩 시작 ---
+2026-01-07 14:54:56 - services.ai_service - INFO - 🔄 로딩 중: forehead (Class:4, Reg:15)
+2026-01-07 14:54:56 - services.ai_service - INFO - ✅ forehead 로드 성공!
+2026-01-07 14:54:56 - services.ai_service - INFO - 🔄 로딩 중: eye_l (Class:4, Reg:8)
+2026-01-07 14:54:56 - services.ai_service - INFO - ✅ eye_l 로드 성공!
+2026-01-07 14:54:56 - services.ai_service - INFO - 🔄 로딩 중: eye_r (Class:4, Reg:8)
+2026-01-07 14:54:56 - services.ai_service - INFO - ✅ eye_r 로드 성공!
+2026-01-07 14:54:56 - services.ai_service - INFO - 🔄 로딩 중: cheek_l (Class:4, Reg:16)
+2026-01-07 14:54:57 - services.ai_service - INFO - ✅ cheek_l 로드 성공!
+2026-01-07 14:54:57 - services.ai_service - INFO - 🔄 로딩 중: cheek_r (Class:4, Reg:16)
+2026-01-07 14:54:57 - services.ai_service - INFO - ✅ cheek_r 로드 성공!
+2026-01-07 14:54:57 - services.ai_service - INFO - 🔄 로딩 중: chin (Class:4, Reg:15)
+2026-01-07 14:54:57 - services.ai_service - INFO - ✅ chin 로드 성공!
+2026-01-07 14:54:57 - services.ai_service - INFO - 총 6개 모델 로드 완료
+2026-01-07 14:55:03 - services.serial_service - INFO - 시리얼 포트 스캔 시작
+2026-01-07 14:55:03 - services.serial_service - INFO - 발견된 포트: COM7 - USB 직렬 장치(COM7)
+2026-01-07 14:55:03 - services.serial_service - INFO - 1개의 시리얼 포트 발견
+2026-01-07 14:55:03 - services.serial_service - INFO - 첫 번째 포트 선택: COM7
+2026-01-07 14:55:03 - services.serial_service - INFO - 시리얼 포트 연결 시도: COM7 @ 115200 baud
+2026-01-07 14:55:05 - services.serial_service - INFO - 시리얼 포트 연결 성공: COM7
+2026-01-07 14:55:28 - services.serial_service - INFO - 명령 전송: START:RED:15
+2026-01-07 14:55:29 - services.serial_service - INFO - 아두이노 응답: Serial command received: START:RED:15
+2026-01-07 14:55:31 - services.serial_service - INFO - 명령 전송: STOP
+2026-01-07 14:55:31 - services.serial_service - INFO - 아두이노 응답: Starting therapy: RED for 15 minutes
+2026-01-07 14:55:38 - services.serial_service - INFO - 명령 전송: START:BLUE:15
+2026-01-07 14:55:38 - services.serial_service - INFO - 아두이노 응답: LED Color set to R:255 G:0 B:0
+2026-01-07 14:55:42 - services.serial_service - INFO - 명령 전송: STOP
+2026-01-07 14:55:42 - services.serial_service - INFO - 아두이노 응답: (Inverted PWM: R:0 G:255 B:255)
+2026-01-07 14:55:44 - services.serial_service - INFO - 명령 전송: START:GOLD:15
+2026-01-07 14:55:44 - services.serial_service - INFO - 아두이노 응답: OK:STARTED:RED:15
+2026-01-07 14:55:46 - services.serial_service - INFO - 명령 전송: STOP
+2026-01-07 14:55:47 - services.serial_service - INFO - 아두이노 응답: Serial command received: STOP
+2026-01-07 14:56:08 - services.analysis_service - INFO - 
+==================================================
+2026-01-07 14:56:08 - services.analysis_service - INFO - 📸 [AI 분석 시작] 사용자: user_6uddhcrxu | 이미지: (720, 1044)
+2026-01-07 14:56:08 - services.analysis_service - INFO - ==================================================
+2026-01-07 14:56:08 - services.image_service - INFO - 
+   🔍 [이미지 검증 시작]
+2026-01-07 14:56:08 - services.image_service - INFO -    📏 이미지 크기: 720x1044
+2026-01-07 14:56:08 - services.image_service - INFO -    💡 평균 밝기: 146.9
+2026-01-07 14:56:08 - services.image_service - ERROR - ❌ Face Detector 초기화 실패: No module named 'cv2'
+2026-01-07 14:56:08 - services.image_service - ERROR -    ❌ Face Detector를 로드할 수 없습니다.
+2026-01-07 14:56:08 - services.analysis_service - ERROR - ❌ 이미지 검증 실패: 서버 내부 오류: 얼굴 인식 모델을 로드할 수 없습니다.
+2026-01-07 15:00:21 - services.ai_service - INFO - --- AI 모델 로딩 시작 ---
+2026-01-07 15:00:21 - services.ai_service - INFO - 🔄 로딩 중: forehead (Class:4, Reg:15)
+2026-01-07 15:00:21 - services.ai_service - INFO - ✅ forehead 로드 성공!
+2026-01-07 15:00:21 - services.ai_service - INFO - 🔄 로딩 중: eye_l (Class:4, Reg:8)
+2026-01-07 15:00:22 - services.ai_service - INFO - ✅ eye_l 로드 성공!
+2026-01-07 15:00:22 - services.ai_service - INFO - 🔄 로딩 중: eye_r (Class:4, Reg:8)
+2026-01-07 15:00:22 - services.ai_service - INFO - ✅ eye_r 로드 성공!
+2026-01-07 15:00:22 - services.ai_service - INFO - 🔄 로딩 중: cheek_l (Class:4, Reg:16)
+2026-01-07 15:00:22 - services.ai_service - INFO - ✅ cheek_l 로드 성공!
+2026-01-07 15:00:22 - services.ai_service - INFO - 🔄 로딩 중: cheek_r (Class:4, Reg:16)
+2026-01-07 15:00:22 - services.ai_service - INFO - ✅ cheek_r 로드 성공!
+2026-01-07 15:00:22 - services.ai_service - INFO - 🔄 로딩 중: chin (Class:4, Reg:15)
+2026-01-07 15:00:22 - services.ai_service - INFO - ✅ chin 로드 성공!
+2026-01-07 15:00:22 - services.ai_service - INFO - 총 6개 모델 로드 완료
+2026-01-07 15:00:29 - services.ai_service - INFO - --- AI 모델 로딩 시작 ---
+2026-01-07 15:00:29 - services.ai_service - INFO - 🔄 로딩 중: forehead (Class:4, Reg:15)
+2026-01-07 15:00:29 - services.ai_service - INFO - ✅ forehead 로드 성공!
+2026-01-07 15:00:29 - services.ai_service - INFO - 🔄 로딩 중: eye_l (Class:4, Reg:8)
+2026-01-07 15:00:29 - services.ai_service - INFO - ✅ eye_l 로드 성공!
+2026-01-07 15:00:29 - services.ai_service - INFO - 🔄 로딩 중: eye_r (Class:4, Reg:8)
+2026-01-07 15:00:29 - services.ai_service - INFO - ✅ eye_r 로드 성공!
+2026-01-07 15:00:29 - services.ai_service - INFO - 🔄 로딩 중: cheek_l (Class:4, Reg:16)
+2026-01-07 15:00:29 - services.ai_service - INFO - ✅ cheek_l 로드 성공!
+2026-01-07 15:00:29 - services.ai_service - INFO - 🔄 로딩 중: cheek_r (Class:4, Reg:16)
+2026-01-07 15:00:30 - services.ai_service - INFO - ✅ cheek_r 로드 성공!
+2026-01-07 15:00:30 - services.ai_service - INFO - 🔄 로딩 중: chin (Class:4, Reg:15)
+2026-01-07 15:00:30 - services.ai_service - INFO - ✅ chin 로드 성공!
+2026-01-07 15:00:30 - services.ai_service - INFO - 총 6개 모델 로드 완료
+2026-01-07 15:00:34 - services.serial_service - INFO - 시리얼 포트 스캔 시작
+2026-01-07 15:00:34 - services.serial_service - INFO - 발견된 포트: COM7 - USB 직렬 장치(COM7)
+2026-01-07 15:00:34 - services.serial_service - INFO - 1개의 시리얼 포트 발견
+2026-01-07 15:00:34 - services.serial_service - INFO - 첫 번째 포트 선택: COM7
+2026-01-07 15:00:34 - services.serial_service - INFO - 시리얼 포트 연결 시도: COM7 @ 115200 baud
+2026-01-07 15:00:36 - services.serial_service - INFO - 시리얼 포트 연결 성공: COM7
+2026-01-07 15:00:44 - services.analysis_service - INFO - 
+==================================================
+2026-01-07 15:00:44 - services.analysis_service - INFO - 📸 [AI 분석 시작] 사용자: user_6uddhcrxu | 이미지: (720, 1044)
+2026-01-07 15:00:44 - services.analysis_service - INFO - ==================================================
+2026-01-07 15:00:44 - services.image_service - INFO - 
+   🔍 [이미지 검증 시작]
+2026-01-07 15:00:44 - services.image_service - INFO -    📏 이미지 크기: 720x1044
+2026-01-07 15:00:44 - services.image_service - INFO -    💡 평균 밝기: 146.9
+2026-01-07 15:00:44 - services.image_service - INFO - ✅ OpenCV Face Detector 초기화 완료
+2026-01-07 15:00:44 - services.image_service - INFO -    🤖 얼굴 검출 실행 중 (OpenCV)...
+2026-01-07 15:00:44 - services.image_service - INFO -    ✅ 1개의 얼굴 감지
+2026-01-07 15:00:44 - services.image_service - INFO -    ✅ 이미지 검증 통과
+2026-01-07 15:00:44 - services.analysis_service - INFO - 
+   🤖 [AI 분석 시작]
+2026-01-07 15:00:44 - services.analysis_service - INFO -    ✅ forehead: Grade 0, Score 83.1
+2026-01-07 15:00:45 - services.analysis_service - INFO -    ✅ eye_l: Grade 0, Score 97.1
+2026-01-07 15:00:45 - services.analysis_service - INFO -    ✅ eye_r: Grade 0, Score 75.1
+2026-01-07 15:00:45 - services.analysis_service - INFO -    ✅ cheek_l: Grade 0, Score 78.9
+2026-01-07 15:00:45 - services.analysis_service - INFO -    ✅ cheek_r: Grade 0, Score 87.3
+2026-01-07 15:00:45 - services.analysis_service - INFO -    ✅ chin: Grade 0, Score 84.2
+2026-01-07 15:00:45 - services.analysis_service - INFO - 
+   📊 전체 점수: 84.3/100
+2026-01-07 15:00:45 - services.analysis_service - INFO -    💡 LED 추천: RED 모드 (15분)
+2026-01-07 15:00:45 - services.analysis_service - INFO - ==================================================
+
+2026-01-07 15:00:45 - services.history_service - INFO - 📝 히스토리 저장 완료: user_6uddhcrxu - 점수 84.3
+2026-01-07 15:00:55 - services.serial_service - INFO - 명령 전송: START:RED:15
+2026-01-07 15:00:55 - services.serial_service - INFO - 아두이노 응답: Serial command received: START:RED:15
+2026-01-07 15:02:28 - services.serial_service - INFO - 명령 전송: START:RED:1
+2026-01-07 15:02:28 - services.serial_service - INFO - 아두이노 응답: Starting therapy: RED for 15 minutes
+2026-01-07 15:02:31 - services.serial_service - INFO - 명령 전송: START:BLUE:1
+2026-01-07 15:02:31 - services.serial_service - INFO - 아두이노 응답: LED Color set to R:255 G:0 B:0
+2026-01-07 15:02:34 - services.serial_service - INFO - 명령 전송: START:GOLD:1
+2026-01-07 15:02:34 - services.serial_service - INFO - 아두이노 응답: (Inverted PWM: R:0 G:255 B:255)
+2026-01-07 15:02:37 - services.serial_service - INFO - 명령 전송: START:RED:1
+2026-01-07 15:02:37 - services.serial_service - INFO - 아두이노 응답: OK:STARTED:RED:15
+2026-01-07 15:02:40 - services.serial_service - INFO - 명령 전송: START:BLUE:1
+2026-01-07 15:02:40 - services.serial_service - INFO - 아두이노 응답: Serial command received: START:RED:1
+2026-01-07 15:02:43 - services.serial_service - INFO - 명령 전송: START:GOLD:1
+2026-01-07 15:02:43 - services.serial_service - INFO - 아두이노 응답: Starting therapy: RED for 1 minutes
+2026-01-07 15:02:51 - services.serial_service - INFO - 명령 전송: START:RED:5
+2026-01-07 15:02:51 - services.serial_service - INFO - 아두이노 응답: LED Color set to R:255 G:0 B:0
+2026-01-07 15:02:54 - services.serial_service - INFO - 명령 전송: STOP
+2026-01-07 15:02:55 - services.serial_service - INFO - 아두이노 응답: (Inverted PWM: R:0 G:255 B:255)
+2026-01-07 15:04:50 - services.serial_service - INFO - 명령 전송: START:BLUE:1
+2026-01-07 15:04:51 - services.serial_service - INFO - 아두이노 응답: OK:STARTED:RED:1
+2026-01-07 15:04:55 - services.serial_service - INFO - 명령 전송: START:RED:1
+2026-01-07 15:04:56 - services.serial_service - INFO - 아두이노 응답: Serial command received: START:BLUE:1
+2026-01-07 15:05:00 - services.serial_service - INFO - 명령 전송: START:BLUE:1
+2026-01-07 15:05:01 - services.serial_service - INFO - 아두이노 응답: Starting therapy: BLUE for 1 minutes
+2026-01-07 15:05:05 - services.serial_service - INFO - 명령 전송: START:RED:1
+2026-01-07 15:05:06 - services.serial_service - INFO - 아두이노 응답: LED Color set to R:0 G:0 B:255
+2026-01-07 15:05:10 - services.serial_service - INFO - 명령 전송: START:BLUE:1
+2026-01-07 15:05:11 - services.serial_service - INFO - 아두이노 응답: (Inverted PWM: R:255 G:255 B:0)
+2026-01-07 15:05:15 - services.serial_service - INFO - 명령 전송: START:RED:1
+2026-01-07 15:05:16 - services.serial_service - INFO - 아두이노 응답: OK:STARTED:BLUE:1
+2026-01-07 15:05:20 - services.serial_service - INFO - 명령 전송: START:BLUE:1
+2026-01-07 15:05:21 - services.serial_service - INFO - 아두이노 응답: Serial command received: START:GOLD:1
+2026-01-07 15:05:25 - services.serial_service - INFO - 명령 전송: START:RED:1
+2026-01-07 15:05:26 - services.serial_service - INFO - 아두이노 응답: Starting therapy: GOLD for 1 minutes
+2026-01-07 15:05:30 - services.serial_service - INFO - 명령 전송: START:BLUE:1
+2026-01-07 15:05:31 - services.serial_service - INFO - 아두이노 응답: LED Color set to R:255 G:215 B:0
+2026-01-07 15:05:35 - services.serial_service - INFO - 명령 전송: START:RED:1
+2026-01-07 15:05:36 - services.serial_service - INFO - 아두이노 응답: (Inverted PWM: R:0 G:40 B:255)
+2026-01-07 15:05:40 - services.serial_service - INFO - 명령 전송: START:BLUE:1
+2026-01-07 15:05:41 - services.serial_service - INFO - 아두이노 응답: OK:STARTED:GOLD:1
+2026-01-07 15:05:45 - services.serial_service - INFO - 명령 전송: START:RED:1
+2026-01-07 15:05:46 - services.serial_service - INFO - 아두이노 응답: Serial command received: START:RED:1
+2026-01-07 15:05:50 - services.serial_service - INFO - 명령 전송: START:BLUE:1
+2026-01-07 15:05:51 - services.serial_service - INFO - 아두이노 응답: Starting therapy: RED for 1 minutes
+2026-01-07 15:05:55 - services.serial_service - INFO - 명령 전송: START:RED:1
+2026-01-07 15:05:56 - services.serial_service - INFO - 아두이노 응답: LED Color set to R:255 G:0 B:0
+2026-01-07 15:06:00 - services.serial_service - INFO - 명령 전송: START:BLUE:1
+2026-01-07 15:06:01 - services.serial_service - INFO - 아두이노 응답: (Inverted PWM: R:0 G:255 B:255)
+2026-01-07 15:06:05 - services.serial_service - INFO - 명령 전송: START:RED:1
+2026-01-07 15:06:06 - services.serial_service - INFO - 아두이노 응답: OK:STARTED:RED:1
+2026-01-07 15:06:08 - services.serial_service - INFO - 명령 전송: STOP
+2026-01-07 15:06:08 - services.serial_service - INFO - 아두이노 응답: Serial command received: START:BLUE:1

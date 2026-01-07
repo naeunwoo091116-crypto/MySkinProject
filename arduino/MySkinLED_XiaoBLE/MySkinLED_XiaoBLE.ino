@@ -18,16 +18,17 @@
 
 #include <ArduinoBLE.h>
 
-// Pin Definitions (adjust based on your hardware)
-#define LED_PIN_R 2    // Red LED pin (D2)
-#define LED_PIN_G 3    // Green LED pin (D3)
-#define LED_PIN_B 4    // Blue LED pin (D4)
-#define STATUS_LED LED_BUILTIN
+// Pin Definitions (Seeed Xiao BLE Sense Plus - Onboard RGB LED)
+// 실제 핀맵: https://wiki.seeedstudio.com/XIAO_BLE/#hardware-overview
+#define LED_PIN_R 11   // Red LED (actual pin)
+#define LED_PIN_G 12   // Green LED (actual pin)
+#define LED_PIN_B 13   // Blue LED (actual pin)
+#define STATUS_LED LED_BUILTIN  // 내장 상태 LED
 
 // BLE Service and Characteristic
 BLEService ledService("0000FFE0-0000-1000-8000-00805F9B34FB");
 BLEStringCharacteristic commandCharacteristic("0000FFE1-0000-1000-8000-00805F9B34FB",
-                                               BLEWrite | BLERead, 50);
+                                               BLEWrite | BLERead | BLENotify, 100);
 
 // LED Mode RGB values (0-255)
 struct LEDMode {
@@ -50,7 +51,8 @@ bool therapyActive = false;
 // Function prototypes
 void setupPins();
 void setupBLE();
-void handleCommand(String cmd);
+void processCommand(String cmd, bool isBLE);
+void sendResponse(String response, bool isBLE);
 void setLEDColor(int r, int g, int b);
 void startTherapy(String mode, int durationMin);
 void stopTherapy();
@@ -65,10 +67,29 @@ void setup() {
   Serial.println("Initializing...");
 
   setupPins();
+
+  // LED 하드웨어 테스트
+  Serial.println("Testing LEDs...");
+  Serial.println("Red LED test (2 sec)");
+  setLEDColor(255, 0, 0);
+  delay(2000);
+
+  Serial.println("Green LED test (2 sec)");
+  setLEDColor(0, 255, 0);
+  delay(2000);
+
+  Serial.println("Blue LED test (2 sec)");
+  setLEDColor(0, 0, 255);
+  delay(2000);
+
+  Serial.println("All OFF");
+  setLEDColor(0, 0, 0);
+
   setupBLE();
 
   Serial.println("Ready!");
   Serial.println("Waiting for BLE connection...");
+  Serial.println("Send 'TEST' to run LED test again");
 }
 
 void loop() {
@@ -79,7 +100,7 @@ void loop() {
     if (command.length() > 0) {
       Serial.print("Serial command received: ");
       Serial.println(command);
-      handleSerialCommand(command);
+      processCommand(command, false);
     }
   }
 
@@ -97,7 +118,9 @@ void loop() {
         String command = Serial.readStringUntil('\n');
         command.trim();
         if (command.length() > 0) {
-          handleSerialCommand(command);
+          Serial.print("Serial command received: ");
+          Serial.println(command);
+          processCommand(command, false);
         }
       }
 
@@ -106,7 +129,7 @@ void loop() {
         String command = commandCharacteristic.value();
         Serial.print("Received BLE command: ");
         Serial.println(command);
-        handleCommand(command);
+        processCommand(command, true);
       }
 
       // Update therapy state
@@ -173,9 +196,12 @@ void setupBLE() {
   Serial.println("Device name: MySkin_LED_Mask");
 }
 
-void handleSerialCommand(String cmd) {
+// Unified command processing function
+void processCommand(String cmd, bool isBLE) {
   cmd.trim();
   cmd.toUpperCase();
+
+  String response = "";
 
   // Command format: "START:MODE:DURATION"
   if (cmd.startsWith("START:")) {
@@ -190,79 +216,61 @@ void handleSerialCommand(String cmd) {
 
       if (duration > 0 && duration <= 60) {  // Max 60 minutes
         startTherapy(mode, duration);
-        Serial.println("OK:STARTED:" + mode + ":" + String(duration));
+        response = "OK:STARTED:" + mode + ":" + String(duration);
       } else {
-        Serial.println("ERROR:INVALID_DURATION");
+        response = "ERROR:INVALID_DURATION";
+        Serial.println("Invalid duration (must be 1-60 minutes)");
       }
     } else {
-      Serial.println("ERROR:INVALID_FORMAT");
+      response = "ERROR:INVALID_FORMAT";
+      Serial.println("Invalid command format");
     }
   }
   else if (cmd == "STOP") {
     stopTherapy();
-    Serial.println("OK:STOPPED");
+    response = "OK:STOPPED";
   }
   else if (cmd == "STATUS") {
     if (therapyActive) {
       unsigned long elapsed = (millis() - therapyStartTime) / 1000;
       unsigned long remaining = (therapyDuration / 1000) - elapsed;
-      String status = "ACTIVE:" + currentMode + ":" + String(remaining);
-      Serial.println(status);
+      response = "ACTIVE:" + currentMode + ":" + String(remaining);
     } else {
-      Serial.println("IDLE");
+      response = "IDLE";
     }
   }
-  else {
-    Serial.println("ERROR:UNKNOWN_COMMAND");
+  else if (cmd == "TEST") {
+    // LED 하드웨어 테스트
+    Serial.println("Running LED test sequence...");
+    setLEDColor(255, 0, 0);
+    delay(1000);
+    setLEDColor(0, 255, 0);
+    delay(1000);
+    setLEDColor(0, 0, 255);
+    delay(1000);
+    setLEDColor(255, 215, 0);
+    delay(1000);
+    setLEDColor(0, 0, 0);
+    response = "OK:TEST_COMPLETED";
   }
+  else {
+    response = "ERROR:UNKNOWN_COMMAND";
+    Serial.println("Unknown command: " + cmd);
+  }
+
+  // Send response
+  sendResponse(response, isBLE);
 }
 
-void handleCommand(String cmd) {
-  cmd.trim();
-  cmd.toUpperCase();
-
-  // Command format: "START:MODE:DURATION"
-  if (cmd.startsWith("START:")) {
-    int firstColon = cmd.indexOf(':');
-    int secondColon = cmd.indexOf(':', firstColon + 1);
-
-    if (secondColon > 0) {
-      String mode = cmd.substring(firstColon + 1, secondColon);
-      int duration = cmd.substring(secondColon + 1).toInt();
-
-      mode.trim();
-
-      if (duration > 0 && duration <= 60) {  // Max 60 minutes
-        startTherapy(mode, duration);
-        commandCharacteristic.writeValue("OK:STARTED:" + mode + ":" + String(duration));
-      } else {
-        Serial.println("Invalid duration (must be 1-60 minutes)");
-        commandCharacteristic.writeValue("ERROR:INVALID_DURATION");
-      }
-    } else {
-      Serial.println("Invalid command format");
-      commandCharacteristic.writeValue("ERROR:INVALID_FORMAT");
-    }
-  }
-  else if (cmd == "STOP") {
-    stopTherapy();
-    commandCharacteristic.writeValue("OK:STOPPED");
-  }
-  else if (cmd == "STATUS") {
-    if (therapyActive) {
-      unsigned long elapsed = (millis() - therapyStartTime) / 1000;
-      unsigned long remaining = (therapyDuration / 1000) - elapsed;
-      String status = "ACTIVE:" + currentMode + ":" + String(remaining);
-      commandCharacteristic.writeValue(status);
-      Serial.println(status);
-    } else {
-      commandCharacteristic.writeValue("IDLE");
-      Serial.println("Status: IDLE");
-    }
-  }
-  else {
-    Serial.println("Unknown command");
-    commandCharacteristic.writeValue("ERROR:UNKNOWN_COMMAND");
+// Send response via BLE or Serial
+void sendResponse(String response, bool isBLE) {
+  if (isBLE) {
+    // Send via BLE
+    commandCharacteristic.writeValue(response);
+    Serial.println("BLE Response: " + response);
+  } else {
+    // Send via Serial
+    Serial.println(response);
   }
 }
 
@@ -290,8 +298,7 @@ void startTherapy(String mode, int durationMin) {
   }
 
   if (!modeFound) {
-    Serial.println("Invalid mode");
-    commandCharacteristic.writeValue("ERROR:INVALID_MODE");
+    Serial.println("Invalid mode: " + mode);
   }
 }
 
@@ -309,8 +316,14 @@ void updateTherapy() {
 
   if (elapsed >= therapyDuration) {
     Serial.println("Therapy completed!");
+
+    // Send completion notification via BLE if connected
+    BLEDevice central = BLE.central();
+    if (central && central.connected()) {
+      commandCharacteristic.writeValue("COMPLETED");
+    }
+
     stopTherapy();
-    commandCharacteristic.writeValue("COMPLETED");
 
     // Blink to indicate completion
     for (int i = 0; i < 3; i++) {
@@ -323,9 +336,11 @@ void updateTherapy() {
 }
 
 void setLEDColor(int r, int g, int b) {
-  analogWrite(LED_PIN_R, r);
-  analogWrite(LED_PIN_G, g);
-  analogWrite(LED_PIN_B, b);
+  // Seeed Xiao BLE Sense Plus는 공통 양극(Common Anode) RGB LED
+  // PWM 값을 반전해야 함: 0 = 켜짐, 255 = 꺼짐
+  analogWrite(LED_PIN_R, 255 - r);
+  analogWrite(LED_PIN_G, 255 - g);
+  analogWrite(LED_PIN_B, 255 - b);
 
   Serial.print("LED Color set to R:");
   Serial.print(r);
@@ -333,6 +348,13 @@ void setLEDColor(int r, int g, int b) {
   Serial.print(g);
   Serial.print(" B:");
   Serial.println(b);
+  Serial.print("(Inverted PWM: R:");
+  Serial.print(255 - r);
+  Serial.print(" G:");
+  Serial.print(255 - g);
+  Serial.print(" B:");
+  Serial.print(255 - b);
+  Serial.println(")");
 }
 
 void blinkStatusLED() {
