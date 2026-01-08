@@ -1,0 +1,30 @@
+# Cordova
+platforms/
+plugins/
+node_modules/
+
+# Build outputs
+*.apk
+*.ipa
+*.zip
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Keystore (보안상 중요!)
+*.keystore
+*.jks
+
+# Temporary files
+tmp/
+temp/

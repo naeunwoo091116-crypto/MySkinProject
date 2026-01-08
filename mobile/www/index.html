@@ -1,0 +1,2295 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    
+    <meta http-equiv="Content-Security-Policy" content="default-src * 'unsafe-inline' 'unsafe-eval' data: gap: content:; style-src * 'unsafe-inline'; script-src * 'unsafe-inline' 'unsafe-eval'; img-src * data: blob: 'unsafe-inline'; connect-src * ws: wss:; font-src * data:;">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#ffffff">
+    <title>NutriAdvisor PRO - Rapid Loop</title>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" as="style" crossorigin
+        href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style>
+        /* ==================== DESIGN SYSTEM ==================== */
+        :root {
+            --primary: #10B981;
+            --primary-dark: #059669;
+            --dark-btn: #1F2937;
+            --bg-page: #F3F4F6;
+            --white: #FFFFFF;
+            --text-main: #111827;
+            --text-sub: #6B7280;
+            --danger: #EF4444;
+            --info: #3B82F6;
+            --radius-card: 24px;
+        }
+
+        * {
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Pretendard', sans-serif;
+            background: var(--bg-page);
+            color: var(--text-main);
+            padding-bottom: 90px;
+        }
+
+        /* Splash Screen */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: #ffffff;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.6s ease-out, visibility 0.6s;
+        }
+
+        #splash-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .splash-content {
+            text-align: center;
+            animation: fadeUp 0.8s ease-out;
+        }
+
+        .splash-logo {
+            font-size: 64px;
+            color: var(--primary);
+            margin-bottom: 24px;
+            display: inline-block;
+        }
+
+        .splash-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: var(--text-main);
+            line-height: 1.4;
+            margin: 0;
+        }
+
+        .splash-sub {
+            font-size: 14px;
+            color: var(--text-sub);
+            margin-top: 8px;
+        }
+
+        /* Toast Notification */
+        #toast-container {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            z-index: 100000;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast {
+            background: rgba(31, 41, 55, 0.95);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(8px);
+            animation: slideDown 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 400px;
+            width: 100%;
+            pointer-events: auto;
+        }
+
+        .toast.success {
+            background: rgba(16, 185, 129, 0.95);
+        }
+
+        .toast.error {
+            background: rgba(239, 68, 68, 0.95);
+        }
+
+        .toast i {
+            font-size: 20px;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Layout */
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: var(--bg-page);
+            position: relative;
+        }
+
+        .header {
+            position: sticky;
+            top: 0;
+            z-index: 50;
+            background: rgba(243, 244, 246, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary-dark);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge-pro {
+            background: var(--primary);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 6px;
+            vertical-align: middle;
+        }
+
+        .status-pill {
+            background: #E5E7EB;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-sub);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        .status-pill.connected {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #9CA3AF;
+            margin-right: 4px;
+        }
+
+        .status-pill.connected .status-dot {
+            background: #10B981;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 20px;
+            animation: fadeUp 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: 0;
+            }
+        }
+
+        /* Components */
+        .card {
+            background: var(--white);
+            border-radius: var(--radius-card);
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-main);
+            margin: 24px 0 12px 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Home */
+        .welcome-banner {
+            background: linear-gradient(135deg, #4ADE80 0%, #10B981 100%);
+            border-radius: var(--radius-card);
+            padding: 30px 24px;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 20px rgba(16, 185, 129, 0.2);
+            margin-bottom: 24px;
+        }
+
+        .welcome-banner::after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            right: -20px;
+            width: 120px;
+            height: 120px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .action-btn {
+            background: var(--white);
+            border-radius: var(--radius-card);
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            transition: 0.2s;
+        }
+
+        .action-btn:active {
+            transform: scale(0.98);
+        }
+
+        .action-icon-circle {
+            width: 50px;
+            height: 50px;
+            background: #F3F4F6;
+            border-radius: 16px;
+            margin: 0 auto 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--text-main);
+        }
+
+        .action-btn.primary .action-icon-circle {
+            background: #D1FAE5;
+            color: var(--primary);
+        }
+
+        .h-scroll {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+            margin: 0 -20px;
+            padding: 0 20px 10px 20px;
+            scrollbar-width: none;
+        }
+
+        .course-item {
+            min-width: 140px;
+            background: var(--white);
+            border-radius: 20px;
+            padding: 16px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            position: relative;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .course-item:active {
+            transform: scale(0.95);
+        }
+
+        .course-dot {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        /* Camera */
+        .camera-frame {
+            background: #000;
+            border-radius: var(--radius-card);
+            height: 480px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .face-guide-overlay {
+            position: absolute;
+            width: 260px;
+            height: 340px;
+            border: 2px dashed rgba(255, 255, 255, 0.6);
+            border-radius: 140px;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+            z-index: 10;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px 0;
+        }
+
+        .face-map-container {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            border-radius: 20px;
+            overflow: hidden;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            background: #000;
+        }
+
+        .face-map-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            opacity: 1;
+        }
+
+        /* Buttons & Inputs */
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 24px;
+        }
+
+        .btn-half {
+            flex: 1;
+            padding: 16px;
+            border-radius: 16px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-outline {
+            background: white;
+            border: 1px solid #E5E7EB;
+            color: var(--text-main);
+        }
+
+        .btn-capture {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: white;
+            border: 4px solid #E5E7EB;
+            margin: 0 auto;
+            display: block;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .btn-capture::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 54px;
+            height: 54px;
+            background: var(--primary);
+            border-radius: 50%;
+            transition: 0.2s;
+        }
+
+        .btn-capture:active::after {
+            transform: translate(-50%, -50%) scale(0.9);
+        }
+
+        .btn-dark {
+            width: 100%;
+            padding: 18px;
+            background: var(--dark-btn);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn-green {
+            width: 100%;
+            padding: 18px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 16px;
+            margin-top: 12px;
+            cursor: pointer;
+        }
+
+        .chart-box {
+            background: white;
+            border-radius: 24px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            height: 300px;
+            position: relative;
+            margin-bottom: 24px;
+        }
+
+        .solution-card {
+            background: #ECFDF5;
+            border: 1px solid var(--primary);
+            border-radius: 20px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .mask-visual {
+            width: 160px;
+            height: 220px;
+            margin: 0 auto 30px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 130'%3E%3Cpath d='M50 5 C20 5 5 25 5 60 C5 95 25 125 50 125 C75 125 95 95 95 60 C95 25 80 5 50 5 Z' fill='none' stroke='%23D1D5DB' stroke-width='3'/%3E%3Cpath d='M30 45 Q35 40 40 45 M60 45 Q65 40 70 45' stroke='%23E5E7EB' stroke-width='2' fill='none'/%3E%3Cpath d='M45 80 Q50 85 55 80' stroke='%23E5E7EB' stroke-width='2' fill='none'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+            transition: 0.3s;
+        }
+
+        .mask-visual.red {
+            filter: drop-shadow(0 0 15px rgba(239, 68, 68, 0.6));
+        }
+
+        .mask-visual.blue {
+            filter: drop-shadow(0 0 15px rgba(59, 130, 246, 0.6));
+        }
+
+        .mask-visual.gold {
+            filter: drop-shadow(0 0 15px rgba(245, 158, 11, 0.6));
+        }
+
+        .mode-toggles {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+
+        .mode-btn {
+            flex: 1;
+            padding: 16px;
+            background: white;
+            border: 1px solid #E5E7EB;
+            border-radius: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .mode-btn.active {
+            border-color: var(--primary);
+            background: #ECFDF5;
+            color: var(--primary-dark);
+        }
+
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        input[type=range] {
+            width: 100%;
+            height: 6px;
+            background: #E5E7EB;
+            border-radius: 10px;
+            outline: none;
+            -webkit-appearance: none;
+            margin-bottom: 30px;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            background: var(--primary);
+            border: 3px solid white;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+        }
+
+        .preset-chip {
+            min-width: 100px;
+            background: white;
+            border: 1px solid #E5E7EB;
+            border-radius: 16px;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .preset-chip:active {
+            transform: scale(0.95);
+            background: #f9fafb;
+        }
+
+        .preset-icon {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: block;
+            color: var(--text-main);
+        }
+
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #F3F4F6;
+            padding: 12px 20px 24px;
+            display: flex;
+            justify-content: space-around;
+            z-index: 100;
+        }
+
+        .nav-item {
+            background: none;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 10px;
+            color: #9CA3AF;
+            cursor: pointer;
+        }
+
+        .nav-item i {
+            font-size: 24px;
+            margin-bottom: 2px;
+        }
+
+        .nav-item.active {
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        #loadingOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(2px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+    </style>
+
+    <!-- Cordova Scripts -->
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/config.js"></script>
+    <script type="text/javascript" src="js/camera.js"></script>
+    <script type="text/javascript" src="js/ble.js"></script>
+
+</head>
+
+<body>
+
+    <div id="splash-screen">
+        <div class="splash-content">
+            <i class="ph-fill ph-plant splash-logo"></i>
+            <h1 class="splash-title">LED 마스크 스킨케어<br>뉴트리어드바이저</h1>
+            <div class="splash-sub">Premium Home Care Solution</div>
+        </div>
+    </div>
+
+    <div id="toast-container"></div>
+
+    <!-- 프로필 설정 모달 -->
+    <div id="profile-modal"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 10000; align-items: center; justify-content: center;">
+        <div
+            style="background: white; border-radius: 24px; padding: 32px; max-width: 400px; width: 90%; max-height: 80vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <h2 style="margin: 0; font-size: 20px; font-weight: 700;">프로필 설정</h2>
+                <div style="display: flex; gap: 8px;">
+                    <button onclick="openUserSelectModal()"
+                        style="padding: 6px 12px; background: #F3F4F6; border: none; border-radius: 8px; font-size: 12px; cursor: pointer; color: #4B5563;">
+                        <i class="ph-bold ph-users"></i> 사용자 전환
+                    </button>
+                    <button onclick="closeProfileModal()"
+                        style="background: none; border: none; font-size: 24px; cursor: pointer; padding: 0; color: #9CA3AF;">
+                        <i class="ph-bold ph-x"></i>
+                    </button>
+                </div>
+            </div>
+
+
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 13px; font-weight: 600; color: #666; margin-bottom: 8px;">이름
+                    *</label>
+                <input type="text" id="profile-name" placeholder="홍길동"
+                    style="width: 100%; padding: 12px 16px; border: 2px solid #E5E7EB; border-radius: 12px; font-size: 14px; outline: none;">
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 13px; font-weight: 600; color: #666; margin-bottom: 8px;">피부
+                    타입</label>
+                <select id="profile-skin-type"
+                    style="width: 100%; padding: 12px 16px; border: 2px solid #E5E7EB; border-radius: 12px; font-size: 14px; outline: none; background: white;">
+                    <option value="">선택해주세요</option>
+                    <option value="건성">건성</option>
+                    <option value="지성">지성</option>
+                    <option value="복합성">복합성</option>
+                    <option value="민감성">민감성</option>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; font-size: 13px; font-weight: 600; color: #666; margin-bottom: 8px;">피부 고민
+                    (여러 개 선택 가능)</label>
+                <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                    <label
+                        style="display: inline-flex; align-items: center; padding: 8px 12px; background: #F3F4F6; border-radius: 8px; cursor: pointer; font-size: 13px;">
+                        <input type="checkbox" value="주름" style="margin-right: 6px;"> 주름
+                    </label>
+                    <label
+                        style="display: inline-flex; align-items: center; padding: 8px 12px; background: #F3F4F6; border-radius: 8px; cursor: pointer; font-size: 13px;">
+                        <input type="checkbox" value="색소침착" style="margin-right: 6px;"> 색소침착
+                    </label>
+                    <label
+                        style="display: inline-flex; align-items: center; padding: 8px 12px; background: #F3F4F6; border-radius: 8px; cursor: pointer; font-size: 13px;">
+                        <input type="checkbox" value="모공" style="margin-right: 6px;"> 모공
+                    </label>
+                    <label
+                        style="display: inline-flex; align-items: center; padding: 8px 12px; background: #F3F4F6; border-radius: 8px; cursor: pointer; font-size: 13px;">
+                        <input type="checkbox" value="탄력" style="margin-right: 6px;"> 탄력
+                    </label>
+                    <label
+                        style="display: inline-flex; align-items: center; padding: 8px 12px; background: #F3F4F6; border-radius: 8px; cursor: pointer; font-size: 13px;">
+                        <input type="checkbox" value="여드름" style="margin-right: 6px;"> 여드름
+                    </label>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 24px;">
+                <label style="display: block; font-size: 13px; font-weight: 600; color: #666; margin-bottom: 8px;">관리
+                    목표</label>
+                <textarea id="profile-goals" placeholder="원하는 피부 상태를 입력해주세요"
+                    style="width: 100%; padding: 12px 16px; border: 2px solid #E5E7EB; border-radius: 12px; font-size: 14px; outline: none; resize: vertical; min-height: 80px;"></textarea>
+            </div>
+
+            <button onclick="saveProfile()" class="btn-primary"
+                style="width: 100%; padding: 14px; background: var(--primary); color: white; border: none; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer;">
+                <i class="ph-bold ph-check"></i> 저장하기
+            </button>
+        </div>
+    </div>
+
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <i class="ph-fill ph-plant" style="color:var(--primary);"></i>
+                NutriAdvisor <span class="badge-pro">PRO</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <button onclick="openProfileModal()"
+                    style="background: #E5E7EB; border: none; padding: 8px 12px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: #374151;">
+                    <i class="ph-fill ph-user-circle" style="font-size: 16px;"></i>
+                    <span id="header-username">사용자</span>
+                </button>
+                <div class="status-pill" id="ble-btn-header" onclick="toggleBle()">
+                    <div class="status-dot"></div>
+                    <span id="ble-text-header">Connect</span>
+                </div>
+            </div>
+        </header>
+
+        <div id="tab-home" class="tab-content active">
+            <div class="welcome-banner">
+                <h2 style="margin:0 0 8px 0; font-size: 24px;">반갑습니다, <span id="welcome-username">사용자</span>님</h2>
+                <p style="margin:0; opacity:0.9; font-size: 14px;">오늘의 피부 컨디션을 확인해보세요.</p>
+            </div>
+
+            <div class="section-title">빠른 실행</div>
+            <div class="quick-actions">
+                <div class="action-btn" onclick="switchTab('device')">
+                    <div class="action-icon-circle"><i class="ph-fill ph-power"></i></div>
+                    <div style="font-weight:700; margin-bottom:4px;">빠른 시작</div>
+                    <div style="font-size:12px; color:#666;">분석 없이 켜기</div>
+                </div>
+                <div class="action-btn primary" onclick="startAnalysis()">
+                    <div class="action-icon-circle"><i class="ph-fill ph-scan"></i></div>
+                    <div style="font-weight:700; margin-bottom:4px;">AI 스마트 케어</div>
+                    <div style="font-size:12px; color:#065F46;">측정 후 맞춤 설정</div>
+                </div>
+            </div>
+
+            <div class="section-title"><i class="ph-fill ph-star" style="color:#F59E0B"></i> 전문가 추천 코스</div>
+            <div class="h-scroll">
+                <div class="course-item" onclick="applyCourse('red', 15, '탄력/주름')">
+                    <div class="course-dot" style="background:#EF4444;"></div>
+                    <div style="font-size:24px; margin-bottom:8px; color:var(--text-main);">
+                        <i class="ph-fill ph-flower"></i>
+                    </div>
+                    <div style="font-weight:700; font-size:14px;">탄력/주름</div>
+                    <div style="font-size:11px; color:#666;">Red · 15분</div>
+                </div>
+                <div class="course-item" onclick="applyCourse('blue', 20, '모공/진정')">
+                    <div class="course-dot" style="background:#3B82F6;"></div>
+                    <div style="font-size:24px; margin-bottom:8px; color:var(--text-main);">
+                        <i class="ph-fill ph-drop"></i>
+                    </div>
+                    <div style="font-weight:700; font-size:14px;">모공/진정</div>
+                    <div style="font-size:11px; color:#666;">Blue · 20분</div>
+                </div>
+                <div class="course-item" onclick="applyCourse('gold', 15, '미백/톤업')">
+                    <div class="course-dot" style="background:#F59E0B;"></div>
+                    <div style="font-size:24px; margin-bottom:8px; color:var(--text-main);">
+                        <i class="ph-fill ph-sparkle"></i>
+                    </div>
+                    <div style="font-weight:700; font-size:14px;">미백/톤업</div>
+                    <div style="font-size:11px; color:#666;">Gold · 15분</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-analysis" class="tab-content">
+            <div id="analysis-cam">
+                <div class="section-title">피부 촬영</div>
+
+                <div class="camera-frame">
+                    <div class="face-guide-overlay" id="face-guide-overlay" style="display:none;">
+                        <div
+                            style="color:white; font-size:12px; background:rgba(0,0,0,0.5); padding:4px 8px; border-radius:8px;">
+                            이마</div>
+                        <div style="display:flex; width:100%; justify-content:space-between; padding:0 30px;">
+                            <span
+                                style="color:white; font-size:12px; background:rgba(0,0,0,0.5); padding:4px 8px; border-radius:8px;">눈가</span>
+                            <span
+                                style="color:white; font-size:12px; background:rgba(0,0,0,0.5); padding:4px 8px; border-radius:8px;">눈가</span>
+                        </div>
+                        <div
+                            style="color:white; font-size:12px; background:rgba(0,0,0,0.5); padding:4px 8px; border-radius:8px; margin-top:100px;">
+                            턱</div>
+                    </div>
+
+                    <img id="preview-img" style="width:100%; height:100%; object-fit:cover; display:none;">
+
+                    <div id="cam-guide" style="text-align:center; color:#999;">
+                        <i class="ph ph-camera" style="font-size:48px; margin-bottom:8px; opacity:0.5;"></i>
+                        <p style="margin:0;">카메라 또는 앨범을 선택하세요</p>
+                    </div>
+                </div>
+
+                <div id="btn-group-init" class="btn-row">
+                    <button class="btn-half btn-outline" onclick="triggerGallery()">
+                        <i class="ph-bold ph-image"></i> 앨범 선택
+                    </button>
+                    <button class="btn-half btn-primary" onclick="startCamera()">
+                        <i class="ph-bold ph-camera"></i> 카메라 촬영
+                    </button>
+                </div>
+
+                <div id="btn-group-capture" style="display:none; text-align:center; margin-bottom:24px;">
+                    <button class="btn-capture" onclick="captureCamera()"></button>
+                    <div style="margin-top:8px; font-size:12px; color:#666;">촬영하려면 누르세요</div>
+                </div>
+
+                <div id="btn-group-confirm" class="btn-row" style="display:none;">
+                    <button class="btn-half btn-outline" onclick="changePhoto()">
+                        <i class="ph-bold ph-images"></i> 사진 변경
+                    </button>
+                    <button class="btn-half btn-dark" onclick="runAi()">
+                        <i class="ph-bold ph-lightning"></i> AI 분석 실행
+                    </button>
+                </div>
+
+                <input type="file" id="file-input" style="display:none;" accept="image/*" onchange="handleFile(this)">
+            </div>
+
+            <div id="analysis-result" class="hidden">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                    <div class="section-title" style="margin:0;">얼굴 피부 정밀 분석</div>
+                    <button onclick="reanalyze()"
+                        style="padding:8px 16px; background:#F3F4F6; border:none; border-radius:12px; font-size:13px; font-weight:600; cursor:pointer; color:#4B5563; display:flex; align-items:center; gap:6px;">
+                        <i class="ph-bold ph-camera-rotate"></i> 재분석
+                    </button>
+                </div>
+
+                <div class="face-map-container">
+                    <img id="result-face-img" class="face-map-img" src="" alt="Face">
+                </div>
+
+                <div style="text-align:center; margin-bottom:20px; margin-top: 10px;">
+                    <div style="font-size:13px; color:#666;">종합 피부 점수</div>
+                    <div id="score-display"
+                        style="font-size:42px; font-weight:800; color:var(--primary); line-height:1;">-</div>
+                </div>
+
+                <div class="chart-box"><canvas id="radarChart"></canvas></div>
+
+                <div class="section-title">
+                    <i class="ph-fill ph-magnifying-glass-plus" style="color:#6366F1"></i> 상세 피부 분석
+                </div>
+                <div id="detailed-metrics" class="card" style="display:none;">
+                    <div style="font-size:13px; color:#666; margin-bottom:12px;">주요 피부 지표 (AI 분석)</div>
+                    <div id="metrics-content"
+                        style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:12px;"></div>
+                    <button onclick="toggleMetrics()"
+                        style="width:100%; padding:10px; background:#F3F4F6; border:none; border-radius:12px; font-size:13px; font-weight:600; cursor:pointer; color:#4B5563;">
+                        <span id="toggle-text">접기</span> <i class="ph-bold ph-caret-up"></i>
+                    </button>
+                </div>
+
+                <div class="section-title">AI 맞춤 솔루션</div>
+                <div class="solution-card">
+                    <div style="font-size:32px; color:var(--primary-dark);">
+                        <i class="ph-fill ph-flower"></i>
+                    </div>
+                    <div>
+                        <div style="font-weight:700; font-size:16px;">탄력 집중 코스</div>
+                        <div style="font-size:13px; color:#666;">눈가와 볼 부위 집중 케어 필요</div>
+                    </div>
+                </div>
+                <button class="btn-green" onclick="applyCourse('red', 15, '탄력 집중 코스')">솔루션 디바이스 전송 <i
+                        class="ph-bold ph-arrow-right"></i></button>
+            </div>
+        </div>
+
+        <div id="tab-device" class="tab-content">
+            <div class="section-title">기기 관리</div>
+            <div class="card" style="display:flex; justify-content:space-between; align-items:center;">
+                <div>
+                    <div style="font-weight:700; font-size:16px; margin-bottom:4px;">LED Mask 상태</div>
+                    <div id="device-tab-status" style="font-size:13px; color:#666;">연결된 기기가 없습니다</div>
+                </div>
+                <button id="ble-btn-device" onclick="toggleBle()"
+                    style="padding:10px 16px; background:#F3F4F6; border:none; border-radius:12px; font-weight:600; color:#1F2937; cursor:pointer;">
+                    <i class="ph-bold ph-bluetooth-connect"></i> 기기 찾기
+                </button>
+            </div>
+
+            <div class="section-title">수동 제어</div>
+            <div class="card">
+                <div style="text-align:center; margin-bottom:24px;">
+                    <div class="mask-visual" id="mask-visual"></div>
+                    <h3 id="device-title" style="margin:0;">Custom Mode</h3>
+                    <p id="device-subtitle" style="margin:5px 0 16px 0; color:#666; font-size:13px;">Ready to start</p>
+
+                    <button id="btn-power" class="btn-dark" onclick="togglePower()" style="margin-bottom: 20px;">
+                        <i class="ph-bold ph-power"></i> Start Therapy
+                    </button>
+
+                    <div id="loop-status-bar" style="display:none; margin-top: 10px;">
+                        <div
+                            style="font-size:12px; color:#666; margin-bottom:8px; display:flex; justify-content:space-between;">
+                            <span id="loop-step-text" style="font-weight:600;">Step 1: Red Mode</span>
+                            <span id="loop-timer-text">남은 시간: 5:00</span>
+                        </div>
+                        <div style="width:100%; height:8px; background:#E5E7EB; border-radius:4px; overflow:hidden;">
+                            <div id="loop-progress"
+                                style="width:0%; height:100%; background:var(--primary); transition:width 1s linear; border-radius:4px;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <label style="font-size:13px; font-weight:600; color:#666; display:block; margin-bottom:10px;">LED
+                    MODE</label>
+                <div class="mode-toggles">
+                    <div class="mode-btn active" id="mode-red" onclick="setMode('red')">
+                        <div class="dot" style="background:#EF4444;"></div> Red
+                    </div>
+                    <div class="mode-btn" id="mode-blue" onclick="setMode('blue')">
+                        <div class="dot" style="background:#3B82F6;"></div> Blue
+                    </div>
+                    <div class="mode-btn" id="mode-gold" onclick="setMode('gold')">
+                        <div class="dot" style="background:#F59E0B;"></div> Gold
+                    </div>
+                </div>
+
+                <label
+                    style="font-size:13px; font-weight:600; color:#666; display:flex; justify-content:space-between; margin-bottom:10px;">
+                    <span>DURATION (수동 설정 시)</span> <span id="time-val" style="color:var(--primary);">15 min</span>
+                </label>
+                <input type="range" id="time-slider" min="5" max="30" step="5" value="15"
+                    oninput="updateTime(this.value)">
+            </div>
+
+            <div class="section-title">
+                <i class="ph-fill ph-arrows-clockwise" style="color:#8B5CF6"></i> 프리미엄 순환 케어 (초 단위)
+            </div>
+            <div class="h-scroll" style="margin-bottom:24px;">
+                <div class="course-item" onclick="startLoopCourse('full_care')" style="min-width:160px;">
+                    <div class="course-dot" style="background:linear-gradient(90deg, #EF4444, #3B82F6, #F59E0B);"></div>
+                    <div style="font-size:24px; margin-bottom:8px; color:var(--text-main);">
+                        <i class="ph-fill ph-magic-wand"></i>
+                    </div>
+                    <div style="font-weight:700; font-size:14px;">3초 간격 풀 케어</div>
+                    <div style="font-size:11px; color:#666;">R(3s)→B(3s)→G(3s) · 15분</div>
+                </div>
+
+                <div class="course-item" onclick="startLoopCourse('acne_care')" style="min-width:160px;">
+                    <div class="course-dot" style="background:linear-gradient(90deg, #3B82F6, #EF4444);"></div>
+                    <div style="font-size:24px; margin-bottom:8px; color:var(--text-main);">
+                        <i class="ph-fill ph-shield-check"></i>
+                    </div>
+                    <div style="font-weight:700; font-size:14px;">5초 간격 트러블</div>
+                    <div style="font-size:11px; color:#666;">B(5s)→R(5s) · 15분</div>
+                </div>
+            </div>
+
+            <div class="section-title">빠른 시나리오 (단일 모드)</div>
+            <div class="h-scroll" style="margin-bottom:20px;">
+                <div class="preset-chip" onclick="applyCourse('red', 5, '모닝 케어')">
+                    <span class="preset-icon"><i class="ph-fill ph-sun"></i></span>
+                    <div style="font-weight:700; font-size:13px;">모닝 케어</div>
+                    <div style="font-size:10px; color:#666;">Red 5분</div>
+                </div>
+                <div class="preset-chip" onclick="applyCourse('blue', 20, '트러블 진정')">
+                    <span class="preset-icon"><i class="ph-fill ph-drop"></i></span>
+                    <div style="font-weight:700; font-size:13px;">트러블 진정</div>
+                    <div style="font-size:10px; color:#666;">Blue 20분</div>
+                </div>
+                <div class="preset-chip" onclick="applyCourse('gold', 15, '나이트 리페어')">
+                    <span class="preset-icon"><i class="ph-fill ph-moon-stars"></i></span>
+                    <div style="font-weight:700; font-size:13px;">나이트 리페어</div>
+                    <div style="font-size:10px; color:#666;">Gold 15분</div>
+                </div>
+                <div class="preset-chip" onclick="applyCourse('red', 20, '집중 탄력')">
+                    <span class="preset-icon"><i class="ph-fill ph-activity"></i></span>
+                    <div style="font-weight:700; font-size:13px;">집중 탄력</div>
+                    <div style="font-size:10px; color:#666;">Red 20분</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-history" class="tab-content">
+            <div class="section-title">피부 변화 리포트</div>
+            <div class="card" style="height:250px;"><canvas id="lineChart"></canvas></div>
+            <div class="section-title">최근 기록</div>
+            <div id="history-list"></div>
+        </div>
+
+        <nav class="nav-bar">
+            <button class="nav-item active" onclick="switchTab('home')"><i class="ph-fill ph-house"></i> 홈</button>
+            <button class="nav-item" onclick="switchTab('analysis')"><i class="ph-bold ph-scan"></i> 분석</button>
+            <button class="nav-item" onclick="switchTab('device')"><i class="ph-bold ph-sliders-horizontal"></i>
+                디바이스</button>
+            <button class="nav-item" onclick="switchTab('history')"><i class="ph-bold ph-clock-counter-clockwise"></i>
+                기록</button>
+        </nav>
+    </div>
+
+    <!-- 사용자 선택 모달 (Body Level) -->
+    <div id="user-select-modal"
+        style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 11000; align-items: center; justify-content: center;">
+        <div
+            style="background: white; border-radius: 24px; padding: 32px; max-width: 400px; width: 90%; max-height: 80vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                <h2 style="margin: 0; font-size: 20px; font-weight: 700;">사용자 선택</h2>
+                <button onclick="closeUserSelectModal()"
+                    style="background: none; border: none; font-size: 24px; cursor: pointer; padding: 0; color: #9CA3AF;">
+                    <i class="ph-bold ph-x"></i>
+                </button>
+            </div>
+
+            <div id="user-list" style="margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px;">
+                <!-- 사용자 목록이 여기에 동적으로 로드됩니다 -->
+            </div>
+
+            <button onclick="createNewUser()" class="btn-outline"
+                style="width: 100%; padding: 14px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <i class="ph-bold ph-plus"></i> 새 사용자 만들기
+            </button>
+        </div>
+    </div>
+
+    <script>
+        
+    /*
+     * Cordova용 API 호출 수정 필요:
+     * - fetch('/api/v1/...') → fetch(API.analysisFace()) 등으로 변경
+     * - 카메라: cordovaCamera.takePicture() 사용
+     * - BLE: cordovaBLE.scan(), cordovaBLE.connect() 사용
+     */
+    // ============================================
+        // 1. Splash & Init
+        // ============================================
+        document.addEventListener("DOMContentLoaded", function () {
+            // 사용자 프로필 로드 (비동기 호출)
+            loadUserProfile();
+
+            // BLE 상태 확인 (비동기 호출)
+            checkBleStatus();
+
+            // 1. 정상적인 제거 타이머 (2초 후)
+            setTimeout(() => {
+                removeSplashScreen();
+            }, 2000);
+
+            // 2. 안전장치: 혹시라도 2초 타이머가 실패할 경우를 대비해 5초 후 강제 제거
+            setTimeout(() => {
+                removeSplashScreen();
+            }, 5000);
+        });
+
+        function removeSplashScreen() {
+            const splash = document.getElementById('splash-screen');
+            if (splash && !splash.classList.contains('hidden')) {
+                splash.classList.add('hidden');
+                setTimeout(() => { splash.style.display = 'none'; }, 600);
+            }
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            let icon = 'ph-info';
+            if (type === 'success') icon = 'ph-check-circle';
+            if (type === 'error') icon = 'ph-warning-circle';
+            toast.innerHTML = `<i class="ph-fill ${icon}"></i> <span>${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.animation = 'fadeOut 0.4s forwards';
+                setTimeout(() => toast.remove(), 400);
+            }, 3000);
+        }
+
+        const CONFIG = {
+            API_BASE_URL: (typeof APP_CONFIG !== 'undefined' && APP_CONFIG.API_BASE_URL) ? APP_CONFIG.API_BASE_URL : '',
+            USER_ID: localStorage.getItem('myskin_user_id') || 'user_' + Math.random().toString(36).substr(2, 9)
+        };
+
+        // 디버깅: CONFIG 확인
+        console.log('=== CONFIG 초기화 ===');
+        console.log('APP_CONFIG exists:', typeof APP_CONFIG !== 'undefined');
+        console.log('CONFIG.API_BASE_URL:', CONFIG.API_BASE_URL);
+        console.log('CONFIG.USER_ID:', CONFIG.USER_ID);
+
+        // USER_ID를 localStorage에 저장
+        if (!localStorage.getItem('myskin_user_id')) {
+            localStorage.setItem('myskin_user_id', CONFIG.USER_ID);
+        }
+
+        // ============================================
+        // 프로필 관리 함수
+        // ============================================
+        async function loadUserProfile() {
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/api/v1/user/profile/${CONFIG.USER_ID}`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const profile = data.profile;
+
+                    if (profile && profile.name) {
+                        // 헤더와 환영 배너 업데이트
+                        document.getElementById('header-username').textContent = profile.name;
+                        document.getElementById('welcome-username').textContent = profile.name;
+
+                        // localStorage에 이름 저장
+                        localStorage.setItem('myskin_username', profile.name);
+                    }
+                } else {
+                    // 프로필이 없으면 localStorage에서 불러오기
+                    const savedName = localStorage.getItem('myskin_username');
+                    if (savedName) {
+                        document.getElementById('header-username').textContent = savedName;
+                        document.getElementById('welcome-username').textContent = savedName;
+                    }
+                }
+            } catch (error) {
+                console.log('프로필 로드 실패:', error);
+                // 오류 시 localStorage에서 불러오기
+                const savedName = localStorage.getItem('myskin_username');
+                if (savedName) {
+                    document.getElementById('header-username').textContent = savedName;
+                    document.getElementById('welcome-username').textContent = savedName;
+                }
+            }
+        }
+
+        function openProfileModal() {
+            const modal = document.getElementById('profile-modal');
+            modal.style.display = 'flex';
+
+            // 기존 프로필 데이터 로드
+            loadProfileToModal();
+        }
+
+        function closeProfileModal() {
+            document.getElementById('profile-modal').style.display = 'none';
+        }
+
+        async function loadProfileToModal() {
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/api/v1/user/profile/${CONFIG.USER_ID}`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const profile = data.profile;
+
+                    if (profile) {
+                        document.getElementById('profile-name').value = profile.name || '';
+                        document.getElementById('profile-skin-type').value = profile.skin_type || '';
+                        document.getElementById('profile-goals').value = profile.goals || '';
+
+                        // 체크박스 설정
+                        const concerns = profile.concerns || [];
+                        document.querySelectorAll('#profile-modal input[type="checkbox"]').forEach(cb => {
+                            cb.checked = concerns.includes(cb.value);
+                        });
+                    }
+                }
+            } catch (error) {
+                console.log('프로필 로드 실패:', error);
+            }
+        }
+
+        // ============================================
+        // 사용자 전환 기능
+        // ============================================
+        function openUserSelectModal() {
+            closeProfileModal(); // 프로필 모달 닫기
+            document.getElementById('user-select-modal').style.display = 'flex';
+            loadUserList();
+        }
+
+        function closeUserSelectModal() {
+            document.getElementById('user-select-modal').style.display = 'none';
+        }
+
+        async function loadUserList() {
+            const listContainer = document.getElementById('user-list');
+            listContainer.innerHTML = '<div style="text-align:center; padding:20px;">로딩 중...</div>';
+
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/api/v1/users`);
+                if (response.ok) {
+                    const data = await response.json();
+                    const users = data.users || [];
+
+                    if (users.length === 0) {
+                        listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:#666;">등록된 사용자가 없습니다.</div>';
+                        return;
+                    }
+
+                    listContainer.innerHTML = users.map(user => {
+                        const isCurrent = user.user_id === CONFIG.USER_ID;
+                        const bgColor = isCurrent ? '#ECFDF5' : '#F9FAFB';
+                        const borderColor = isCurrent ? 'var(--primary)' : '#E5E7EB';
+
+                        // 현재 사용자나 기본 사용자가 아니면 삭제 버튼 표시
+                        const canDelete = !isCurrent;
+
+                        return `
+                        <div style="background:${bgColor}; border:1px solid ${borderColor}; padding:10px 16px; border-radius:16px; display:flex; align-items:center; justify-content:space-between; transition:0.2s;">
+                            <div onclick="selectUser('${user.user_id}', '${user.name}')" style="flex:1; display:flex; align-items:center; gap:12px; cursor:pointer;">
+                                <div style="width:40px; height:40px; background:white; border-radius:50%; display:flex; align-items:center; justify-content:center; border:1px solid #E5E7EB; color:#4B5563;">
+                                    <i class="ph-fill ph-user"></i>
+                                </div>
+                                <div>
+                                    <div style="font-weight:700; font-size:15px; color:#1F2937;">${user.name || '이름 없음'}</div>
+                                    <div style="font-size:12px; color:#6B7280;">최근 접속: ${new Date(user.created_at).toLocaleDateString()}</div>
+                                </div>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:8px;">
+                                ${isCurrent ? '<i class="ph-bold ph-check" style="color:var(--primary); font-size:20px; margin-right:8px;"></i>' : ''}
+                                ${canDelete ? `
+                                <button onclick="deleteUser('${user.user_id}', '${user.name}')" style="padding:8px; border:none; background:#FEE2E2; color:#EF4444; border-radius:8px; cursor:pointer;">
+                                    <i class="ph-bold ph-trash"></i>
+                                </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                        `;
+                    }).join('');
+                }
+            } catch (error) {
+                console.error("사용자 목록 로드 오류:", error);
+                listContainer.innerHTML = '<div style="text-align:center; padding:20px; color:red;">목록을 불러오지 못했습니다.</div>';
+            }
+        }
+
+        async function deleteUser(userId, userName) {
+            if (!confirm(`정말로 '${userName}' 사용자를 삭제하시겠습니까?\\n모든 기록이 삭제되며 복구할 수 없습니다.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/api/v1/user/${userId}`, {
+                    method: 'DELETE'
+                });
+
+                if (response.ok) {
+                    showToast('사용자가 삭제되었습니다.', 'success');
+                    loadUserList(); // 목록 새로고침
+                } else {
+                    showToast('사용자 삭제 실패', 'error');
+                }
+            } catch (error) {
+                console.error("삭제 오류:", error);
+                showToast('오류 발생', 'error');
+            }
+        }
+
+        function selectUser(userId, userName) {
+            if (userId === CONFIG.USER_ID) {
+                closeUserSelectModal();
+                return;
+            }
+
+            CONFIG.USER_ID = userId;
+            localStorage.setItem('myskin_user_id', userId);
+
+            if (userName) {
+                localStorage.setItem('myskin_username', userName);
+                document.getElementById('header-username').textContent = userName;
+                document.getElementById('welcome-username').textContent = userName;
+            }
+
+            // 데이터 새로고침
+            loadUserProfile();
+
+            // 히스토리 등 다른 데이터도 필요하면 리로드
+            // 예: renderHistory(); 
+            // 현재 구조상 탭 전환 시 로드되므로 강제 리로드 불필요할 수 있음
+
+            closeUserSelectModal();
+            showToast(`${userName}님으로 전환되었습니다`, 'success');
+        }
+
+        function createNewUser() {
+            const newId = 'user_' + Math.random().toString(36).substr(2, 9);
+            CONFIG.USER_ID = newId;
+            localStorage.setItem('myskin_user_id', newId);
+            localStorage.removeItem('myskin_username'); // 이름 초기화
+
+            // UI 초기화
+            document.getElementById('header-username').textContent = '새 사용자';
+            document.getElementById('welcome-username').textContent = '새 사용자';
+
+            closeUserSelectModal();
+            openProfileModal(); // 바로 프로필 설정 유도
+
+            // 입력 필드 초기화
+            document.getElementById('profile-name').value = '';
+            document.getElementById('profile-skin-type').value = '';
+            document.getElementById('profile-goals').value = '';
+            document.querySelectorAll('#profile-modal input[type="checkbox"]').forEach(cb => cb.checked = false);
+
+            showToast('새 사용자가 생성되었습니다. 프로필을 설정해주세요.', 'info');
+        }
+
+        async function saveProfile() {
+            const name = document.getElementById('profile-name').value.trim();
+
+            if (!name) {
+                showToast('이름을 입력해주세요', 'error');
+                return;
+            }
+
+            // 선택된 피부 고민 수집
+            const concerns = Array.from(document.querySelectorAll('#profile-modal input[type="checkbox"]:checked'))
+                .map(cb => cb.value);
+
+            const profileData = {
+                user_id: CONFIG.USER_ID,
+                name: name,
+                skin_type: document.getElementById('profile-skin-type').value,
+                concerns: concerns,
+                goals: document.getElementById('profile-goals').value.trim()
+            };
+
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/api/v1/user/profile`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(profileData)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+
+                    // UI 업데이트
+                    document.getElementById('header-username').textContent = name;
+                    document.getElementById('welcome-username').textContent = name;
+
+                    // localStorage에 저장
+                    localStorage.setItem('myskin_username', name);
+
+                    closeProfileModal();
+                    showToast('프로필이 저장되었습니다', 'success');
+                } else {
+                    showToast('프로필 저장에 실패했습니다', 'error');
+                }
+            } catch (error) {
+                console.error('프로필 저장 오류:', error);
+                showToast('프로필 저장 중 오류가 발생했습니다', 'error');
+            }
+        }
+
+        // ============================================
+        // 2. State & Constants
+        // ============================================
+        let state = {
+            connected: false, bleDeviceName: '', power: false,
+            mode: 'red', wavelength: 630, time: 15, intensity: 75,
+            cameraStream: null, capturedImage: null, history: [],
+
+            // Loop 기능 상태
+            isLooping: false,
+            loopQueue: [],
+            currentLoopIndex: 0,
+            loopTimerDetails: null
+        };
+
+        // [중요] 루프 패턴 정의 (sec: 초 단위 지속 시간)
+        // 총 15분(900초) 동안 이 패턴이 계속 반복됩니다.
+        const LOOP_PATTERNS = {
+            'full_care': {
+                totalMin: 15,
+                steps: [
+                    { mode: 'red', sec: 3, name: 'RED (3s)' },
+                    { mode: 'blue', sec: 3, name: 'BLUE (3s)' },
+                    { mode: 'gold', sec: 3, name: 'GOLD (3s)' }
+                ]
+            },
+            'acne_care': {
+                totalMin: 15,
+                steps: [
+                    { mode: 'blue', sec: 5, name: 'BLUE (5s)' },
+                    { mode: 'red', sec: 5, name: 'RED (5s)' }
+                ]
+            }
+        };
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+
+            const targetTab = document.getElementById('tab-' + tabId);
+            if (targetTab) targetTab.classList.add('active');
+
+            const tabs = ['home', 'analysis', 'device', 'history'];
+            const navItems = document.querySelectorAll('.nav-item');
+            if (navItems[tabs.indexOf(tabId)]) navItems[tabs.indexOf(tabId)].classList.add('active');
+
+            if (tabId === 'history') renderHistory();
+            window.scrollTo(0, 0);
+        }
+
+        // ============================================
+        // 3. BLE Logic (Backend API 사용)
+        // ============================================
+        async function checkBleStatus() {
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/api/v1/ble/status`);
+                const data = await response.json();
+
+                if (data.connected && data.status !== 'disconnected') {
+                    state.connected = true;
+                    state.bleDeviceName = 'MySkin_LED_Mask';
+                    updateBleStatus(true, state.bleDeviceName);
+                    console.log('BLE 디바이스 이미 연결됨');
+                } else {
+                    state.connected = false;
+                    updateBleStatus(false);
+                }
+            } catch (error) {
+                console.error('BLE 상태 확인 오류:', error);
+                state.connected = false;
+                updateBleStatus(false);
+            }
+        }
+
+        async function toggleBle() {
+            if (state.connected) {
+                await disconnectBle();
+            } else {
+                await connectBle();
+            }
+        }
+
+        async function connectBle() {
+            try {
+                console.log('=== connectBle 함수 호출됨 ===');
+                console.log('CONFIG.API_BASE_URL:', CONFIG.API_BASE_URL);
+                showToast('BLE 디바이스 연결 중...', 'info');
+
+                const apiUrl = `${CONFIG.API_BASE_URL}/api/v1/ble/connect`;
+                console.log('BLE API 호출 URL:', apiUrl);
+
+                // 백엔드 API로 BLE 연결 요청
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})  // 자동으로 MySkin_LED_Mask 검색
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    state.connected = true;
+                    state.bleDeviceName = 'MySkin_LED_Mask';
+                    updateBleStatus(true, state.bleDeviceName);
+                    showToast('BLE 디바이스 연결 성공!', 'success');
+                } else {
+                    throw new Error(data.message || '연결 실패');
+                }
+            } catch (error) {
+                console.error('BLE 연결 오류:', error);
+                showToast('연결 실패: ' + error.message, 'error');
+                state.connected = false;
+                updateBleStatus(false);
+            }
+        }
+
+        async function disconnectBle() {
+            try {
+                // 연결 해제 시 모든 동작 정지
+                stopTherapy(false);
+
+                // 백엔드 API로 연결 해제 요청
+                const response = await fetch(`${CONFIG.API_BASE_URL}/api/v1/ble/disconnect`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+
+                const data = await response.json();
+
+                state.connected = false;
+                state.bleDeviceName = '';
+                updateBleStatus(false);
+                showToast('기기 연결이 해제되었습니다.', 'info');
+            } catch (error) {
+                console.error('연결 해제 오류:', error);
+                state.connected = false;
+                updateBleStatus(false);
+            }
+        }
+
+        async function sendLedCommand(command) {
+            if (!state.connected) {
+                showToast("기기 연결 필요", "error");
+                return;
+            }
+
+            try {
+                // 명령어 파싱 (예: "START:RED:20")
+                const parts = command.split(':');
+
+                if (parts[0] === 'START' && parts.length === 3) {
+                    const mode = parts[1].toLowerCase();
+                    const duration = parseInt(parts[2]);
+
+                    const response = await fetch(`${CONFIG.API_BASE_URL}/api/v1/ble/therapy/start`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ mode, duration })
+                    });
+
+                    const data = await response.json();
+                    if (!data.success) {
+                        throw new Error(data.message || '명령 전송 실패');
+                    }
+                    console.log("LED 테라피 시작:", data);
+
+                } else if (parts[0] === 'STOP') {
+                    const response = await fetch(`${CONFIG.API_BASE_URL}/api/v1/ble/therapy/stop`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+
+                    const data = await response.json();
+                    if (!data.success) {
+                        throw new Error(data.message || '중지 실패');
+                    }
+                    console.log("LED 테라피 중지:", data);
+                } else {
+                    console.log("알 수 없는 명령:", command);
+                }
+
+            } catch (error) {
+                console.error("BLE 명령 전송 오류:", error);
+                showToast("명령 전송 실패: " + error.message, "error");
+            }
+        }
+
+        function updateBleStatus(connected, deviceName = '') {
+            const pill = document.getElementById('ble-btn-header'); const txt = document.getElementById('ble-text-header');
+            const devStatus = document.getElementById('device-tab-status'); const devBtn = document.getElementById('ble-btn-device');
+
+            if (connected) {
+                pill.classList.add('connected'); txt.innerText = 'Connected';
+                if (devStatus) devStatus.innerHTML = `<span style="color:#10B981">●</span> <b>${deviceName}</b> 연결됨`;
+                if (devBtn) { devBtn.innerHTML = `연결 해제`; devBtn.style.color = '#EF4444'; }
+            } else {
+                pill.classList.remove('connected'); txt.innerText = 'Connect';
+                if (devStatus) devStatus.innerHTML = '연결된 기기가 없습니다';
+                if (devBtn) { devBtn.innerHTML = `<i class="ph-bold ph-bluetooth-connect"></i> 기기 찾기`; devBtn.style.color = '#1F2937'; }
+            }
+        }
+
+        // ============================================
+        // 4. Camera Logic
+        // ============================================
+        async function startAnalysis() { switchTab('analysis'); resetCamera(); }
+
+        function triggerGallery() {
+            const fileInput = document.getElementById('file-input');
+            // 파일 입력 초기화 (같은 파일 재선택 가능)
+            fileInput.value = '';
+            fileInput.click();
+        }
+
+        function handleFile(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const preview = document.getElementById('preview-img');
+                    preview.src = e.target.result; preview.style.display = 'block';
+                    document.getElementById('cam-guide').style.display = 'none';
+                    document.getElementById('btn-group-init').style.display = 'none';
+                    document.getElementById('btn-group-capture').style.display = 'none';
+                    document.getElementById('btn-group-confirm').style.display = 'flex';
+                    state.capturedImage = file;
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // 사진 변경 기능
+        function changePhoto() {
+            // 파일 선택 창 열기
+            const fileInput = document.getElementById('file-input');
+
+            // 기존 파일 선택 이벤트 리스너 제거 후 재등록 (중복 방지)
+            const newFileInput = fileInput.cloneNode(true);
+            fileInput.parentNode.replaceChild(newFileInput, fileInput);
+
+            newFileInput.onchange = function (e) {
+                if (this.files && this.files[0]) {
+                    const file = this.files[0];
+                    const reader = new FileReader();
+                    reader.onload = function (event) {
+                        const preview = document.getElementById('preview-img');
+                        preview.src = event.target.result;
+                        preview.style.display = 'block';
+
+                        // UI 상태 업데이트
+                        document.getElementById('cam-guide').style.display = 'none';
+                        document.getElementById('btn-group-init').style.display = 'none';
+                        document.getElementById('btn-group-capture').style.display = 'none';
+                        document.getElementById('btn-group-confirm').style.display = 'flex';
+
+                        state.capturedImage = file;
+                        showToast('사진이 변경되었습니다', 'success');
+                    }
+                    reader.readAsDataURL(file);
+                }
+            };
+
+            newFileInput.click();
+        }
+
+        // 재분석 기능 (결과 화면에서 다른 사진으로 재분석)
+        function reanalyze() {
+            // 분석 탭으로 이동
+            document.getElementById('analysis-result').classList.add('hidden');
+            document.getElementById('analysis-cam').style.display = 'block';
+
+            // 파일 입력 초기화 (같은 파일 재선택 가능하도록)
+            const fileInput = document.getElementById('file-input');
+            if (fileInput) {
+                fileInput.value = '';
+            }
+
+            // 카메라 초기 상태로 리셋
+            resetCamera();
+
+            showToast('새로운 사진을 선택해주세요', 'info');
+        }
+
+        async function startCamera() {
+            try {
+                if (state.cameraStream) state.cameraStream.getTracks().forEach(t => t.stop());
+                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 1280 } }, audio: false });
+
+                const frame = document.querySelector('.camera-frame');
+                let video = document.getElementById('cameraVideo');
+                if (video) video.remove();
+
+                video = document.createElement('video'); video.id = 'cameraVideo';
+                video.setAttribute('autoplay', ''); video.setAttribute('playsinline', ''); video.setAttribute('muted', '');
+                video.srcObject = stream;
+                video.style.cssText = 'width:100%; height:100%; object-fit:cover; transform:scaleX(-1);';
+                video.onloadedmetadata = () => { video.play().catch(e => console.log(e)); };
+
+                document.getElementById('preview-img').style.display = 'none';
+                document.getElementById('cam-guide').style.display = 'none';
+                document.getElementById('face-guide-overlay').style.display = 'flex';
+                frame.prepend(video); state.cameraStream = stream;
+
+                document.getElementById('btn-group-init').style.display = 'none';
+                document.getElementById('btn-group-capture').style.display = 'block';
+                document.getElementById('btn-group-confirm').style.display = 'none';
+            } catch (error) { showToast('카메라 권한 오류', 'error'); }
+        }
+
+        async function captureCamera() {
+            const video = document.getElementById('cameraVideo');
+            if (video && state.cameraStream) {
+                const canvas = document.createElement('canvas');
+                canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+                const ctx = canvas.getContext('2d');
+                ctx.translate(canvas.width, 0); ctx.scale(-1, 1);
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+                state.cameraStream.getTracks().forEach(t => t.stop()); state.cameraStream = null; video.remove();
+                document.getElementById('face-guide-overlay').style.display = 'none';
+
+                state.capturedImage = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.95));
+                document.getElementById('preview-img').src = URL.createObjectURL(state.capturedImage);
+                document.getElementById('preview-img').style.display = 'block';
+                document.getElementById('btn-group-capture').style.display = 'none';
+                document.getElementById('btn-group-confirm').style.display = 'flex';
+            }
+        }
+
+        function resetCamera() {
+            if (state.cameraStream) { state.cameraStream.getTracks().forEach(t => t.stop()); state.cameraStream = null; }
+            const video = document.getElementById('cameraVideo'); if (video) video.remove();
+            document.getElementById('preview-img').style.display = 'none';
+            document.getElementById('cam-guide').style.display = 'block';
+            document.getElementById('face-guide-overlay').style.display = 'none';
+            document.getElementById('btn-group-init').style.display = 'flex';
+            document.getElementById('btn-group-capture').style.display = 'none';
+            document.getElementById('btn-group-confirm').style.display = 'none';
+            state.capturedImage = null;
+        }
+
+        // ============================================
+        // 5. AI Analysis (백엔드 연동)
+        // ============================================
+        let currentAnalysisResult = null; // 현재 분석 결과 저장
+
+        async function runAi() {
+            console.log('=== runAi 함수 호출됨 ===');
+            console.log('state.capturedImage:', state.capturedImage);
+            console.log('CONFIG.API_BASE_URL:', CONFIG.API_BASE_URL);
+
+            if (!state.capturedImage) { showToast("사진이 없습니다.", "error"); return; }
+            showLoading(true);
+
+            const resultImg = document.getElementById('result-face-img');
+            if (resultImg) resultImg.src = URL.createObjectURL(state.capturedImage);
+
+            try {
+                const formData = new FormData();
+                formData.append('user_id', CONFIG.USER_ID);
+                formData.append('file', state.capturedImage, 'face.jpg');
+
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+                const apiUrl = `${CONFIG.API_BASE_URL}/api/v1/analysis/face`;
+                console.log('API 호출 URL:', apiUrl);
+
+                // 실제 API 호출
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    body: formData,
+                    signal: controller.signal
+                });
+                clearTimeout(timeoutId);
+
+                // 얼굴 감지 실패 처리
+                if (response.status === 400) {
+                    const errorData = await response.json();
+                    if (errorData.error === 'invalid_image') {
+                        showLoading(false);
+                        showToast(errorData.message, "error");
+                        return;
+                    }
+                }
+
+                if (!response.ok) throw new Error("API 응답 오류");
+                const result = await response.json();
+
+                console.log("📊 AI 분석 결과:", result);
+                currentAnalysisResult = result;
+                displayAnalysisResult(result);
+
+                // 자동으로 히스토리 저장
+                await saveToHistory(result);
+
+            } catch (error) {
+                console.error("분석 오류:", error);
+
+                // 얼굴 감지 실패 메시지가 아닌 경우에만 데모 모드
+                if (error.message !== "invalid_image") {
+                    showToast("AI 분석 실패 (데모 모드 활성화)", "error");
+                } else {
+                    showLoading(false);
+                    return;  // 데모 모드 진입하지 않음
+                }
+
+                // 데모 데이터
+                const demoResult = {
+                    overall_score: Math.floor(Math.random() * 20 + 70),
+                    regions: {
+                        'forehead': { grade: 8, score: 80, metrics: {} },
+                        'eye_l': { grade: 7, score: 75, metrics: {} },
+                        'eye_r': { grade: 7, score: 75, metrics: {} },
+                        'cheek_l': { grade: 8, score: 80, metrics: {} },
+                        'cheek_r': { grade: 8, score: 80, metrics: {} },
+                        'chin': { grade: 9, score: 90, metrics: {} }
+                    },
+                    recommendation: {
+                        mode: 'red',
+                        duration: 20,
+                        reason: '주름 및 탄력 개선 집중',
+                        target_regions: ['forehead', 'eye_l'],
+                        intensity: 75,
+                        ble_command: 'START:RED:20'
+                    },
+                    timestamp: new Date().toISOString()
+                };
+
+                currentAnalysisResult = demoResult;
+                setTimeout(() => displayAnalysisResult(demoResult), 1500);
+            } finally {
+                setTimeout(() => showLoading(false), 1500);
+            }
+        }
+
+        function displayAnalysisResult(result) {
+            document.getElementById('analysis-cam').style.display = 'none';
+            document.getElementById('analysis-result').classList.remove('hidden');
+            document.getElementById('score-display').innerText = Math.round(result.overall_score);
+
+            // 레이더 차트 그리기
+            if (typeof Chart !== 'undefined') {
+                const canvas = document.getElementById('radarChart');
+                const ctx = canvas.getContext('2d');
+
+                // 기존 차트 제거
+                const existingChart = Chart.getChart(ctx);
+                if (existingChart) existingChart.destroy();
+
+                const data = Object.values(result.regions).map(r => r.grade * 10);
+                new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: ['이마', '눈(좌)', '눈(우)', '볼(좌)', '볼(우)', '턱'],
+                        datasets: [{
+                            label: 'Score',
+                            data: data,
+                            fill: true,
+                            backgroundColor: 'rgba(16, 185, 129, 0.2)',
+                            borderColor: '#10B981',
+                            pointBackgroundColor: '#10B981'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            r: {
+                                suggestedMin: 0,
+                                suggestedMax: 100,
+                                ticks: { display: false }
+                            }
+                        },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            }
+
+            // AI 추천 솔루션 업데이트
+            updateRecommendation(result.recommendation);
+
+            // 상세 메트릭 업데이트
+            updateDetailedMetrics(result.regions);
+
+            // 로컬 히스토리에도 추가 (UI 반영용)
+            state.history.unshift({
+                date: new Date().toLocaleDateString(),
+                course: 'AI 정밀 분석',
+                score: result.overall_score
+            });
+        }
+
+        function updateDetailedMetrics(regions) {
+            const metricsContent = document.getElementById('metrics-content');
+            const metricsContainer = document.getElementById('detailed-metrics');
+
+            if (!regions || !metricsContent) return;
+
+            // 모든 부위의 메트릭 수집
+            const allMetrics = {};
+            for (const [regionName, data] of Object.entries(regions)) {
+                if (data.metrics) {
+                    for (const [metricName, value] of Object.entries(data.metrics)) {
+                        if (!allMetrics[metricName]) {
+                            allMetrics[metricName] = [];
+                        }
+                        allMetrics[metricName].push(value);
+                    }
+                }
+            }
+
+            // 평균 계산 및 표시
+            const metrics = Object.entries(allMetrics)
+                .map(([name, values]) => ({
+                    name: name,
+                    avg: values.reduce((a, b) => a + b, 0) / values.length
+                }))
+                .sort((a, b) => b.avg - a.avg)
+                .slice(0, 8); // 상위 8개만
+
+            if (metrics.length > 0) {
+                metricsContent.innerHTML = metrics.map(m => {
+                    const score = Math.round(m.avg);
+                    const color = score > 70 ? '#10B981' : score > 40 ? '#F59E0B' : '#EF4444';
+                    return `
+                    <div style="background:#F9FAFB; padding:10px; border-radius:12px;">
+                        <div style="font-size:11px; color:#666; margin-bottom:4px;">${m.name}</div>
+                        <div style="display:flex; align-items:center; gap:6px;">
+                            <div style="flex:1; height:6px; background:#E5E7EB; border-radius:3px; overflow:hidden;">
+                                <div style="width:${score}%; height:100%; background:${color}; transition:width 0.5s;"></div>
+                            </div>
+                            <div style="font-size:12px; font-weight:700; color:${color};">${score}</div>
+                        </div>
+                    </div>
+                `;
+                }).join('');
+                metricsContainer.style.display = 'block';
+            } else {
+                metricsContainer.style.display = 'none';
+            }
+        }
+
+        function toggleMetrics() {
+            const container = document.getElementById('detailed-metrics');
+            const content = document.getElementById('metrics-content');
+            const toggleText = document.getElementById('toggle-text');
+
+            if (content.style.display === 'none') {
+                content.style.display = 'grid';
+                toggleText.textContent = '접기';
+            } else {
+                content.style.display = 'none';
+                toggleText.textContent = '상세 보기';
+            }
+        }
+
+        function updateRecommendation(recommendation) {
+            if (!recommendation) return;
+
+            const solutionCard = document.querySelector('.solution-card');
+            const iconMap = { red: 'ph-flower', blue: 'ph-drop', gold: 'ph-sparkle' };
+            const colorMap = { red: '#EF4444', blue: '#3B82F6', gold: '#F59E0B' };
+            const nameMap = { red: 'Red 탄력 코스', blue: 'Blue 진정 코스', gold: 'Gold 미백 코스' };
+
+            const icon = iconMap[recommendation.mode] || 'ph-flower';
+            const color = colorMap[recommendation.mode] || '#10B981';
+            const name = nameMap[recommendation.mode] || '맞춤 케어';
+
+            solutionCard.innerHTML = `
+            <div style="font-size:32px; color:${color};">
+                <i class="ph-fill ${icon}"></i>
+            </div>
+            <div>
+                <div style="font-weight:700; font-size:16px;">${name}</div>
+                <div style="font-size:13px; color:#666;">${recommendation.reason} (${recommendation.duration}분 추천)</div>
+            </div>
+        `;
+
+            // 버튼 업데이트
+            const applyBtn = document.querySelector('.btn-green');
+            applyBtn.onclick = () => applyCourse(recommendation.mode, recommendation.duration, name);
+            applyBtn.innerHTML = `솔루션 디바이스 전송 <i class="ph-bold ph-arrow-right"></i>`;
+
+            console.log(`💡 AI 추천: ${recommendation.mode.toUpperCase()} 모드, ${recommendation.duration}분, 강도 ${recommendation.intensity}%`);
+            console.log(`📱 BLE 명령: ${recommendation.ble_command}`);
+        }
+
+        // 히스토리 자동 저장
+        async function saveToHistory(analysisResult) {
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/api/v1/history`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        user_id: CONFIG.USER_ID,
+                        overall_score: analysisResult.overall_score,
+                        regions: analysisResult.regions,
+                        recommendation: analysisResult.recommendation,
+                        timestamp: analysisResult.timestamp,
+                        course_name: 'AI 정밀 분석'
+                    })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('✅ 히스토리 저장 완료:', result.record_id);
+                }
+            } catch (error) {
+                console.warn('히스토리 저장 실패 (오프라인 모드):', error);
+            }
+        }
+
+        // ============================================
+        // 6. Device Control (Manual & Loop)
+        // ============================================
+
+        // [Loop Logic 1] 루프 시작 (초 단위 큐 생성기 포함)
+        function startLoopCourse(courseKey) {
+            if (!state.connected) { showToast("기기를 먼저 연결해주세요.", "error"); return; }
+            switchTab('device');
+
+            const patternData = LOOP_PATTERNS[courseKey];
+            if (!patternData) return;
+
+            // 기존 동작 완전 중지
+            stopTherapy(false);
+
+            state.isLooping = true;
+            state.currentLoopIndex = 0;
+            state.power = true;
+
+            // [큐 생성 로직] 총 15분(900초)을 채울 때까지 패턴 반복
+            const totalSeconds = patternData.totalMin * 60;
+            let accumulatedSec = 0;
+            state.loopQueue = [];
+
+            while (accumulatedSec < totalSeconds) {
+                for (let step of patternData.steps) {
+                    // 객체 복사해서 넣기 (안전성 확보)
+                    state.loopQueue.push({ ...step });
+                    accumulatedSec += step.sec;
+                    if (accumulatedSec >= totalSeconds) break;
+                }
+            }
+
+            // UI 변경 (루프 모드)
+            const btn = document.getElementById('btn-power');
+            btn.style.background = '#8B5CF6';
+            btn.innerHTML = '<i class="ph-bold ph-stop"></i> Stop Loop Care';
+            document.getElementById('loop-status-bar').style.display = 'block';
+
+            runLoopStep();
+        }
+
+        // [Loop Logic 2] 단계별 실행 (초 단위)
+        function runLoopStep() {
+            if (state.currentLoopIndex >= state.loopQueue.length) {
+                finishLoop(); return;
+            }
+
+            const step = state.loopQueue[state.currentLoopIndex];
+
+            // UI 및 설정 업데이트
+            setMode(step.mode);
+
+            // 기기 명령 전송: 여기서는 '3초'나 '5초' 동안만 켜지지만, 
+            // 펌웨어 호환성을 위해 보통 '1분' 명령을 보내놓고 앱이 3초 뒤에 다른 명령을 보내서 끊어버리는 방식을 씁니다.
+            // 또는 펌웨어가 초 단위를 지원하지 않는다면 START:RED:1 (최소 1분)을 보내고 3초 뒤에 START:BLUE:1을 보내면 됩니다.
+            // 여기서는 직관적으로 step.sec을 보내지만, 실제로는 앱 타이머가 제어합니다.
+            sendLedCommand(`START:${step.mode.toUpperCase()}:1`);
+
+            // showToast는 너무 빈번하면 시끄러우므로 첫 시작이나 10번째마다 보여주거나 생략 가능
+            // showToast(`${step.name}`, 'success');
+
+            // 타이머 설정 (초 단위)
+            let remainingSeconds = step.sec;
+            const totalSeconds = step.sec;
+
+            updateLoopUI(step, remainingSeconds, totalSeconds);
+
+            if (state.loopTimerDetails) clearInterval(state.loopTimerDetails);
+
+            state.loopTimerDetails = setInterval(() => {
+                remainingSeconds--;
+                updateLoopUI(step, remainingSeconds, totalSeconds);
+
+                if (remainingSeconds <= 0) {
+                    clearInterval(state.loopTimerDetails);
+                    state.currentLoopIndex++; // 다음 단계로
+                    runLoopStep();
+                }
+            }, 1000);
+        }
+
+        // [Loop Logic 3] 루프 UI 갱신
+        function updateLoopUI(step, remain, total) {
+            // 전체 진행률 계산 (현재 인덱스 기반)
+            const totalSteps = state.loopQueue.length;
+            const currentIdx = state.currentLoopIndex;
+            const percent = ((currentIdx) / totalSteps) * 100;
+
+            const colors = { red: '#EF4444', blue: '#3B82F6', gold: '#F59E0B' };
+
+            document.getElementById('loop-step-text').innerText = `${step.name}`;
+            // 남은 전체 시간 계산은 복잡하므로 현재 스텝의 남은 시간만 표시하거나 심플하게 처리
+            document.getElementById('loop-timer-text').innerText = `남은 시간: ${remain}s`;
+
+            const prog = document.getElementById('loop-progress');
+            prog.style.width = `${percent}%`;
+            prog.style.background = colors[step.mode];
+        }
+
+        function finishLoop() {
+            showToast("모든 코스가 완료되었습니다.", "success");
+            stopTherapy(true);
+        }
+
+        // [Common] 통합 중지 함수
+        function stopTherapy(sendBleCmd = true) {
+            state.power = false;
+            state.isLooping = false;
+            state.loopQueue = [];
+
+            if (state.loopTimerDetails) clearInterval(state.loopTimerDetails);
+            state.loopTimerDetails = null;
+
+            // UI 리셋
+            const btn = document.getElementById('btn-power');
+            btn.style.background = '#1F2937';
+            btn.innerHTML = '<i class="ph-bold ph-power"></i> Start Therapy';
+
+            document.getElementById('mask-visual').className = 'mask-visual';
+            document.getElementById('loop-status-bar').style.display = 'none';
+
+            if (sendBleCmd && state.connected) {
+                sendLedCommand("STOP");
+            }
+        }
+
+        // [Manual] 수동 제어 버튼
+        function togglePower() {
+            if (!state.connected) { showToast("먼저 기기를 연결해주세요.", "error"); return; }
+
+            if (state.power) {
+                stopTherapy(true);
+                showToast("테라피 종료", "info");
+            } else {
+                // 수동 시작
+                state.power = true;
+                state.isLooping = false;
+
+                const btn = document.getElementById('btn-power');
+                btn.style.background = '#EF4444';
+                btn.innerHTML = '<i class="ph-bold ph-stop"></i> Stop Therapy';
+
+                document.getElementById('mask-visual').className = 'mask-visual ' + state.mode;
+
+                sendLedCommand("START:" + state.mode.toUpperCase() + ":" + state.time);
+                showToast("테라피 시작", "success");
+            }
+        }
+
+        function setMode(mode) {
+            state.mode = mode;
+            const waves = { red: 630, blue: 415, gold: 590 };
+            state.wavelength = waves[mode];
+
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            const btn = document.getElementById('mode-' + mode);
+            if (btn) btn.classList.add('active');
+
+            const visual = document.getElementById('mask-visual');
+            if (state.power && visual) visual.className = 'mask-visual ' + mode;
+
+            document.getElementById('device-title').innerText = mode.charAt(0).toUpperCase() + mode.slice(1) + ' Mode';
+
+            if (state.power && !state.isLooping && state.connected) {
+                sendLedCommand("MODE:" + mode.toUpperCase());
+            }
+        }
+
+        function updateTime(val) {
+            state.time = val;
+            document.getElementById('time-val').innerText = val + ' min';
+            document.getElementById('device-subtitle').innerText = `${state.wavelength}nm · ${val} min`;
+        }
+
+        function applyCourse(mode, time, name) {
+            switchTab('device');
+            stopTherapy(false);
+
+            setMode(mode);
+            updateTime(time);
+            document.getElementById('time-slider').value = time;
+            document.getElementById('device-title').innerText = name;
+            showToast(`${name} 설정됨 (수동 시작 필요)`, "success");
+        }
+
+        function showLoading(show) {
+            const existing = document.getElementById('loadingOverlay');
+            if (show) {
+                if (existing) return;
+                const div = document.createElement('div'); div.id = 'loadingOverlay';
+                div.innerHTML = `<div style="background:rgba(255,255,255,0.95); padding:30px 40px; border-radius:24px; text-align:center;"><div style="width:50px; height:50px; border:4px solid #E5E7EB; border-top-color:#10B981; border-radius:50%; animation:spin 1s linear infinite; margin:0 auto 20px;"></div><div style="font-weight:700;">AI 피부 분석 중...</div></div>`;
+                document.body.appendChild(div);
+            } else if (existing) existing.remove();
+        }
+
+        // 히스토리 렌더링 (백엔드 연동)
+        async function renderHistory() {
+            const list = document.getElementById('history-list');
+            list.innerHTML = '<div style="text-align:center; padding:40px; color:#999;">로딩 중...</div>';
+
+            try {
+                const response = await fetch(`${CONFIG.API_BASE_URL}/api/v1/history/${CONFIG.USER_ID}?limit=10`);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const history = data.history || [];
+
+                    if (history.length === 0) {
+                        list.innerHTML = '<div style="text-align:center; padding:40px; color:#999;">기록이 없습니다.</div>';
+                    } else {
+                        list.innerHTML = history.map(item => {
+                            const date = new Date(item.timestamp).toLocaleDateString('ko-KR', {
+                                year: 'numeric', month: 'short', day: 'numeric'
+                            });
+                            return `<div style="background:white; padding:16px; border-radius:16px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;"><div style="display:flex; gap:12px; align-items:center;"><div style="font-size:24px; color:#4B5563;"><i class="ph-fill ph-chart-line-up"></i></div><div><div style="font-weight:700; font-size:14px;">${item.course_name || 'AI 분석'}</div><div style="font-size:12px; color:#999;">${date}</div></div></div><div style="font-size:16px; font-weight:700; color:#10B981">${Math.round(item.overall_score)}</div></div>`;
+                        }).join('');
+                        renderHistoryChart(history);
+                    }
+                } else {
+                    throw new Error('로드 실패');
+                }
+            } catch (error) {
+                console.warn('히스토리 로드 오류:', error);
+                list.innerHTML = state.history.length === 0 ? '<div style="text-align:center; padding:40px; color:#999;">기록이 없습니다.</div>' :
+                    state.history.map(item => `<div style="background:white; padding:16px; border-radius:16px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;"><div style="display:flex; gap:12px; align-items:center;"><div style="font-size:24px; color:#4B5563;"><i class="ph-fill ph-chart-line-up"></i></div><div><div style="font-weight:700; font-size:14px;">${item.course}</div><div style="font-size:12px; color:#999;">${item.date}</div></div></div><div style="font-size:16px; font-weight:700; color:#10B981">${Math.round(item.score)}</div></div>`).join('');
+                renderHistoryChart(state.history.map(h => ({ overall_score: h.score, timestamp: new Date() })));
+            }
+        }
+
+        function renderHistoryChart(history) {
+            if (typeof Chart === 'undefined') return;
+            const canvas = document.getElementById('lineChart');
+            const ctx = canvas.getContext('2d');
+            const existingChart = Chart.getChart(ctx);
+            if (existingChart) existingChart.destroy();
+
+            const recentHistory = history.slice(0, 7).reverse();
+            const scores = recentHistory.map(h => h.overall_score);
+            const labels = recentHistory.map((h, i) => {
+                if (i === recentHistory.length - 1) return 'Today';
+                const date = h.timestamp ? new Date(h.timestamp) : null;
+                return date ? `${date.getMonth() + 1}/${date.getDate()}` : `${i + 1}`;
+            });
+
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{ label: 'Score', data: scores, borderColor: '#10B981', backgroundColor: 'rgba(16, 185, 129, 0.1)', tension: 0.4, fill: true, pointRadius: 4, pointBackgroundColor: '#10B981' }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { min: 0, max: 100, ticks: { stepSize: 20 } }, x: { grid: { display: false } } } }
+            });
+        }
+    </script>
+</body>
+
+</html>

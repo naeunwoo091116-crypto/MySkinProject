@@ -1,0 +1,34 @@
+<?xml version='1.0' encoding='utf-8'?>
+<widget id="com.myskin.app" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>MySkin</name>
+    <description>
+        AI 기반 피부 분석 및 LED 테라피 추천 앱
+    </description>
+    <author email="contact@myskin.com" href="https://myskin.com">
+        MySkin Team
+    </author>
+
+    <!-- 앱 진입점 -->
+    <content src="index.html" />
+
+    <!-- 외부 리소스 접근 허용 -->
+    <access origin="*" />
+    <allow-intent href="http://*/*" />
+    <allow-intent href="https://*/*" />
+
+    <!-- Android 설정 -->
+    <platform name="android">
+        <allow-intent href="market:*" />
+
+        <!-- Android 특화 설정 -->
+        <preference name="android-minSdkVersion" value="24" />
+        <preference name="android-targetSdkVersion" value="33" />
+        <preference name="AndroidInsecureFileModeEnabled" value="true" />
+    </platform>
+
+    <!-- 전역 설정 -->
+    <preference name="DisallowOverscroll" value="true" />
+    <preference name="Orientation" value="portrait" />
+    <preference name="Fullscreen" value="false" />
+    <preference name="BackgroundColor" value="0xFFFFFFFF" />
+</widget>

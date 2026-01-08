@@ -170,5 +170,7 @@ def delete_user(user_id):
 # device_bp (Blueprint)로 이동됨
 
 if __name__ == '__main__':
-    app.run(debug=True, port=5001)
+    # 0.0.0.0으로 설정하여 모든 네트워크 인터페이스에서 접근 가능
+    # 모바일 앱에서 연결하려면 필수!
+    app.run(host='0.0.0.0', debug=True, port=5001)
 
