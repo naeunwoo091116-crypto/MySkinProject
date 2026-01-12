@@ -22,9 +22,9 @@ app.register_blueprint(device_bp)
 # ==========================================
 try:
     init_db()
-    print("✅ 데이터베이스 연결 성공!")
+    print("[INFO] Database connection successful!")
 except Exception as e:
-    print(f"⚠️ 데이터베이스 초기화 오류: {e}")
+    print(f"[WARNING] Database initialization error: {e}")
     # 필요한 경우 여기에 대체 로직 추가
 
 # ==========================================

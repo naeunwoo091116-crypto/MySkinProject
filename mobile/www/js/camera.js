@@ -25,8 +25,15 @@ class CordovaCamera {
 
             navigator.camera.getPicture(
                 (imageData) => {
-                    // Base64 인코딩된 이미지 데이터
-                    resolve('data:image/jpeg;base64,' + imageData);
+                    // imageData는 이미 Base64 문자열 (접두사 없음)
+                    // destinationType이 0 (DATA_URL)이면 접두사 추가
+                    if (imageData.startsWith('data:')) {
+                        // 이미 data URL 형식
+                        resolve(imageData);
+                    } else {
+                        // Base64 문자열만 있으면 접두사 추가
+                        resolve('data:image/jpeg;base64,' + imageData);
+                    }
                 },
                 (error) => {
                     console.error('카메라 오류:', error);
@@ -65,17 +72,36 @@ class CordovaCamera {
 
     // Base64를 Blob으로 변환
     dataURLtoBlob(dataURL) {
-        const arr = dataURL.split(',');
-        const mime = arr[0].match(/:(.*?);/)[1];
-        const bstr = atob(arr[1]);
-        let n = bstr.length;
-        const u8arr = new Uint8Array(n);
+        try {
+            // dataURL 형식 검증
+            if (!dataURL || typeof dataURL !== 'string') {
+                throw new Error('Invalid dataURL');
+            }
 
-        while (n--) {
-            u8arr[n] = bstr.charCodeAt(n);
+            const arr = dataURL.split(',');
+            if (arr.length !== 2) {
+                throw new Error('Invalid dataURL format');
+            }
+
+            const mimeMatch = arr[0].match(/:(.*?);/);
+            if (!mimeMatch) {
+                throw new Error('Cannot extract MIME type');
+            }
+
+            const mime = mimeMatch[1];
+            const bstr = atob(arr[1]); // Base64 디코딩
+            let n = bstr.length;
+            const u8arr = new Uint8Array(n);
+
+            while (n--) {
+                u8arr[n] = bstr.charCodeAt(n);
+            }
+
+            return new Blob([u8arr], { type: mime });
+        } catch (error) {
+            console.error('dataURLtoBlob 오류:', error);
+            throw error;
         }
-
-        return new Blob([u8arr], { type: mime });
     }
 
     // 이미지 업로드 (Flask API로 전송)

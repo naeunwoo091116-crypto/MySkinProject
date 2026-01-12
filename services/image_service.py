@@ -1,5 +1,5 @@
 """
-이미지 전처리 및 검증 서비스 (MediaPipe 얼굴 검출 포함)
+이미지 전처리 및 검증 서비스 (MediaPipe 얼굴 검출)
 """
 import numpy as np
 from PIL import Image
@@ -16,23 +16,29 @@ class ImageService:
         self.face_detector = None
 
     def _get_face_detector(self):
-        """Face Detector 인스턴스 반환 (OpenCV)"""
+        """Face Detector 인스턴스 반환 (MediaPipe)"""
         if self.face_detector is not None:
             return self.face_detector
 
         try:
-            # OpenCV import
-            import cv2
-            
-            # Haar Cascade 로드
-            cascade_path = cv2.data.haarcascades + 'haarcascade_frontalface_default.xml'
-            self.face_detector = cv2.CascadeClassifier(cascade_path)
-            
-            logger.info("✅ OpenCV Face Detector 초기화 완료")
+            # MediaPipe Face Detection (v0.10.x 새 API)
+            from mediapipe.tasks import python
+            from mediapipe.tasks.python import vision
+
+            # BaseOptions 설정
+            base_options = python.BaseOptions(model_asset_path='detector.tflite')
+            options = vision.FaceDetectorOptions(
+                base_options=base_options,
+                min_detection_confidence=0.7
+            )
+            self.face_detector = vision.FaceDetector.create_from_options(options)
+
+            logger.info("✅ MediaPipe Face Detector 초기화 완료")
             return self.face_detector
 
         except Exception as e:
             logger.error(f"❌ Face Detector 초기화 실패: {e}")
+            logger.error("   MediaPipe 모델 파일이 필요합니다. detector.tflite 파일을 다운로드해주세요.")
             return None
 
     def validate_image(self, pil_image):
@@ -61,36 +67,42 @@ class ImageService:
             if mean_brightness > MAX_BRIGHTNESS:
                 return False, "이미지가 너무 밝습니다"
 
-            # 4. 얼굴 검출 (OpenCV 엄격 모드)
+            # 4. 얼굴 검출 (MediaPipe)
             detector = self._get_face_detector()
-            
+
             if detector is None:
                  logger.error("   ❌ Face Detector를 로드할 수 없습니다.")
                  return False, "서버 내부 오류: 얼굴 인식 모델을 로드할 수 없습니다."
 
-            logger.info("   🤖 얼굴 검출 실행 중 (OpenCV)...")
-            
-            # Grayscale 변환
-            import cv2
-            gray = cv2.cvtColor(img_array, cv2.COLOR_RGB2GRAY)
-            
-            # 얼굴 검출
-            faces = detector.detectMultiScale(
-                gray,
-                scaleFactor=1.1,
-                minNeighbors=5,
-                minSize=(30, 30)
-            )
+            logger.info("   🤖 얼굴 검출 실행 중 (MediaPipe)...")
 
-            if len(faces) == 0:
+            # MediaPipe v0.10.x는 Image 객체 필요
+            import mediapipe as mp
+
+            mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=img_array)
+            detection_result = detector.detect(mp_image)
+
+            if not detection_result.detections:
                 logger.warning("   ❌ 얼굴이 감지되지 않았습니다")
                 return False, "얼굴이 감지되지 않았습니다. 정면 사진을 사용해주세요."
 
-            num_faces = len(faces)
+            num_faces = len(detection_result.detections)
             logger.info(f"   ✅ {num_faces}개의 얼굴 감지")
 
+            # 신뢰도 정보 출력
+            for i, detection in enumerate(detection_result.detections):
+                for category in detection.categories:
+                    confidence = category.score
+                    logger.info(f"   📊 얼굴 #{i+1} 신뢰도: {confidence:.2%}")
+
+            # 여러 얼굴이 감지된 경우 경고
             if num_faces > 1:
-                logger.warning(f"   ⚠️ 여러 얼굴({num_faces}개)이 감지되었습니다. 중앙에 위치한 얼굴을 기준으로 분석합니다.")
+                logger.warning(f"   ⚠️ {num_faces}명의 얼굴이 감지되었습니다. 한 명만 나온 사진을 권장합니다.")
+                # 가장 신뢰도 높은 얼굴 선택
+                best_detection = max(detection_result.detections,
+                                    key=lambda d: max(cat.score for cat in d.categories))
+                best_confidence = max(cat.score for cat in best_detection.categories)
+                logger.info(f"   📍 가장 신뢰도 높은 얼굴 선택: {best_confidence:.2%}")
 
             logger.info("   ✅ 이미지 검증 통과")
             return True, "OK"

@@ -19,8 +19,8 @@ try:
     with engine.connect() as conn:
         pass
 except (ImportError, ModuleNotFoundError, Exception) as e:
-    print(f"⚠️ Database connection failed (PostgreSQL): {e}")
-    print("🔄 Falling back to SQLite...")
+    print(f"WARNING: Database connection failed (PostgreSQL): {e}")
+    print("INFO: Falling back to SQLite...")
     DATABASE_URL = "sqlite:///./myskin.db"
     engine = create_engine(DATABASE_URL, echo=True)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -81,7 +81,7 @@ class AnalysisHistory(Base):
 def init_db():
     """Initialize database - create all tables"""
     Base.metadata.create_all(bind=engine)
-    print("✅ Database tables created successfully!")
+    print("[INFO] Database tables created successfully!")
 
 
 def get_db():
