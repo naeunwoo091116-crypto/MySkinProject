@@ -1105,23 +1105,7 @@
     // ============================================
         // 1. Splash & Init
         // ============================================
-        document.addEventListener("DOMContentLoaded", function () {
-            // 사용자 프로필 로드 (비동기 호출)
-            loadUserProfile();
-
-            // BLE 상태 확인 (비동기 호출)
-            checkBleStatus();
-
-            // 1. 정상적인 제거 타이머 (2초 후)
-            setTimeout(() => {
-                removeSplashScreen();
-            }, 2000);
-
-            // 2. 안전장치: 혹시라도 2초 타이머가 실패할 경우를 대비해 5초 후 강제 제거
-            setTimeout(() => {
-                removeSplashScreen();
-            }, 5000);
-        });
+        // DOMContentLoaded는 state 선언 이후로 이동됨
 
         function removeSplashScreen() {
             const splash = document.getElementById('splash-screen');
@@ -1456,6 +1440,57 @@
                 ]
             }
         };
+
+        // ============================================
+        // 초기화 함수 (CONFIG와 state 초기화 이후 실행)
+        // ============================================
+        function initializeApp() {
+            try {
+                console.log('=== 앱 초기화 시작 ===');
+                console.log('CONFIG:', CONFIG);
+                console.log('state:', state);
+
+                // 무조건 스플래시 제거 (에러가 있어도 화면은 보여줌)
+                setTimeout(() => {
+                    console.log('스플래시 제거 시도...');
+                    removeSplashScreen();
+                }, 1000);
+
+                // 안전장치
+                setTimeout(() => {
+                    console.log('스플래시 강제 제거...');
+                    removeSplashScreen();
+                }, 3000);
+
+                // 프로필 로드 시도 (에러가 나도 무시)
+                setTimeout(() => {
+                    loadUserProfile().catch(err => console.warn('프로필 로드 실패:', err));
+                }, 500);
+
+                // BLE 상태 확인 시도 (에러가 나도 무시)
+                setTimeout(() => {
+                    checkBleStatus().catch(err => console.warn('BLE 상태 확인 실패:', err));
+                }, 500);
+
+            } catch (error) {
+                console.error('초기화 중 에러:', error);
+                // 에러가 나도 무조건 스플래시 제거
+                setTimeout(() => removeSplashScreen(), 1000);
+            }
+        }
+
+        // 즉시 초기화 시작 (DOMContentLoaded를 기다리지 않음)
+        try {
+            if (document.readyState === 'loading') {
+                document.addEventListener("DOMContentLoaded", initializeApp);
+            } else {
+                initializeApp();
+            }
+        } catch (error) {
+            console.error('이벤트 리스너 등록 실패:', error);
+            // 실패해도 1초 후 초기화 시도
+            setTimeout(initializeApp, 1000);
+        }
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));

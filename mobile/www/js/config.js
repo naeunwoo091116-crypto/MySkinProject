@@ -4,7 +4,7 @@ const APP_CONFIG = {
     // 안드로이드 에뮬레이터: 10.0.2.2:5001
     // 실제 기기: WiFi IP 주소 (예: 192.168.0.10:5001)
     // 배포용: 실제 서버 URL
-    API_BASE_URL: 'http://192.168.219.93:5001',  // 실제 PC IP
+    API_BASE_URL: 'http://192.168.219.186:5001',  // 실제 PC IP
 
     // BLE 디바이스 설정
     BLE: {
@@ -13,13 +13,13 @@ const APP_CONFIG = {
         DEVICE_NAME: 'Seeed Xiao BLE'
     },
 
-    // 카메라 설정
+    // 카메라 설정 (Camera 객체는 deviceready 이후에 사용 가능)
     CAMERA: {
         quality: 80,
-        destinationType: Camera.DestinationType.DATA_URL,
-        sourceType: Camera.PictureSourceType.CAMERA,
-        encodingType: Camera.EncodingType.JPEG,
-        mediaType: Camera.MediaType.PICTURE,
+        destinationType: 0,  // Camera.DestinationType.DATA_URL
+        sourceType: 1,       // Camera.PictureSourceType.CAMERA
+        encodingType: 0,     // Camera.EncodingType.JPEG
+        mediaType: 0,        // Camera.MediaType.PICTURE
         allowEdit: false,
         correctOrientation: true,
         targetWidth: 1024,
@@ -54,7 +54,10 @@ function testServerConnection() {
         })
         .catch(error => {
             console.error('❌ 서버 연결 실패:', error);
-            showToast('서버에 연결할 수 없습니다. 네트워크를 확인해주세요.', 'error');
+            // showToast가 정의되어 있으면 호출
+            if (typeof showToast === 'function') {
+                showToast('서버에 연결할 수 없습니다. 네트워크를 확인해주세요.', 'error');
+            }
             return false;
         });
 }

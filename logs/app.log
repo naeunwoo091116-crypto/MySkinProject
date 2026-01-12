@@ -2383,3 +2383,247 @@
 2026-01-08 12:57:15 - services.ai_service - INFO - 🔄 로딩 중: chin (Class:4, Reg:15)
 2026-01-08 12:57:15 - services.ai_service - INFO - ✅ chin 로드 성공!
 2026-01-08 12:57:15 - services.ai_service - INFO - 총 6개 모델 로드 완료
+2026-01-12 11:19:25 - services.ai_service - INFO - --- AI 모델 로딩 시작 ---
+2026-01-12 11:19:25 - services.ai_service - INFO - 🔄 로딩 중: forehead (Class:4, Reg:15)
+2026-01-12 11:19:25 - services.ai_service - INFO - ✅ forehead 로드 성공!
+2026-01-12 11:19:25 - services.ai_service - INFO - 🔄 로딩 중: eye_l (Class:4, Reg:8)
+2026-01-12 11:19:25 - services.ai_service - INFO - ✅ eye_l 로드 성공!
+2026-01-12 11:19:25 - services.ai_service - INFO - 🔄 로딩 중: eye_r (Class:4, Reg:8)
+2026-01-12 11:19:25 - services.ai_service - INFO - ✅ eye_r 로드 성공!
+2026-01-12 11:19:25 - services.ai_service - INFO - 🔄 로딩 중: cheek_l (Class:4, Reg:16)
+2026-01-12 11:19:25 - services.ai_service - INFO - ✅ cheek_l 로드 성공!
+2026-01-12 11:19:25 - services.ai_service - INFO - 🔄 로딩 중: cheek_r (Class:4, Reg:16)
+2026-01-12 11:19:26 - services.ai_service - INFO - ✅ cheek_r 로드 성공!
+2026-01-12 11:19:26 - services.ai_service - INFO - 🔄 로딩 중: chin (Class:4, Reg:15)
+2026-01-12 11:19:26 - services.ai_service - INFO - ✅ chin 로드 성공!
+2026-01-12 11:19:26 - services.ai_service - INFO - 총 6개 모델 로드 완료
+2026-01-12 11:19:32 - services.ai_service - INFO - --- AI 모델 로딩 시작 ---
+2026-01-12 11:19:32 - services.ai_service - INFO - 🔄 로딩 중: forehead (Class:4, Reg:15)
+2026-01-12 11:19:32 - services.ai_service - INFO - ✅ forehead 로드 성공!
+2026-01-12 11:19:32 - services.ai_service - INFO - 🔄 로딩 중: eye_l (Class:4, Reg:8)
+2026-01-12 11:19:32 - services.ai_service - INFO - ✅ eye_l 로드 성공!
+2026-01-12 11:19:32 - services.ai_service - INFO - 🔄 로딩 중: eye_r (Class:4, Reg:8)
+2026-01-12 11:19:32 - services.ai_service - INFO - ✅ eye_r 로드 성공!
+2026-01-12 11:19:32 - services.ai_service - INFO - 🔄 로딩 중: cheek_l (Class:4, Reg:16)
+2026-01-12 11:19:32 - services.ai_service - INFO - ✅ cheek_l 로드 성공!
+2026-01-12 11:19:32 - services.ai_service - INFO - 🔄 로딩 중: cheek_r (Class:4, Reg:16)
+2026-01-12 11:19:33 - services.ai_service - INFO - ✅ cheek_r 로드 성공!
+2026-01-12 11:19:33 - services.ai_service - INFO - 🔄 로딩 중: chin (Class:4, Reg:15)
+2026-01-12 11:19:33 - services.ai_service - INFO - ✅ chin 로드 성공!
+2026-01-12 11:19:33 - services.ai_service - INFO - 총 6개 모델 로드 완료
+2026-01-12 11:25:33 - services.ai_service - INFO - --- AI 모델 로딩 시작 ---
+2026-01-12 11:25:33 - services.ai_service - INFO - 🔄 로딩 중: forehead (Class:4, Reg:15)
+2026-01-12 11:25:33 - services.ai_service - INFO - ✅ forehead 로드 성공!
+2026-01-12 11:25:33 - services.ai_service - INFO - 🔄 로딩 중: eye_l (Class:4, Reg:8)
+2026-01-12 11:25:34 - services.ai_service - INFO - ✅ eye_l 로드 성공!
+2026-01-12 11:25:34 - services.ai_service - INFO - 🔄 로딩 중: eye_r (Class:4, Reg:8)
+2026-01-12 11:25:34 - services.ai_service - INFO - ✅ eye_r 로드 성공!
+2026-01-12 11:25:34 - services.ai_service - INFO - 🔄 로딩 중: cheek_l (Class:4, Reg:16)
+2026-01-12 11:25:34 - services.ai_service - INFO - ✅ cheek_l 로드 성공!
+2026-01-12 11:25:34 - services.ai_service - INFO - 🔄 로딩 중: cheek_r (Class:4, Reg:16)
+2026-01-12 11:25:34 - services.ai_service - INFO - ✅ cheek_r 로드 성공!
+2026-01-12 11:25:34 - services.ai_service - INFO - 🔄 로딩 중: chin (Class:4, Reg:15)
+2026-01-12 11:25:34 - services.ai_service - INFO - ✅ chin 로드 성공!
+2026-01-12 11:25:34 - services.ai_service - INFO - 총 6개 모델 로드 완료
+2026-01-12 11:25:41 - services.ai_service - INFO - --- AI 모델 로딩 시작 ---
+2026-01-12 11:25:41 - services.ai_service - INFO - 🔄 로딩 중: forehead (Class:4, Reg:15)
+2026-01-12 11:25:41 - services.ai_service - INFO - ✅ forehead 로드 성공!
+2026-01-12 11:25:41 - services.ai_service - INFO - 🔄 로딩 중: eye_l (Class:4, Reg:8)
+2026-01-12 11:25:41 - services.ai_service - INFO - ✅ eye_l 로드 성공!
+2026-01-12 11:25:41 - services.ai_service - INFO - 🔄 로딩 중: eye_r (Class:4, Reg:8)
+2026-01-12 11:25:41 - services.ai_service - INFO - ✅ eye_r 로드 성공!
+2026-01-12 11:25:41 - services.ai_service - INFO - 🔄 로딩 중: cheek_l (Class:4, Reg:16)
+2026-01-12 11:25:41 - services.ai_service - INFO - ✅ cheek_l 로드 성공!
+2026-01-12 11:25:41 - services.ai_service - INFO - 🔄 로딩 중: cheek_r (Class:4, Reg:16)
+2026-01-12 11:25:42 - services.ai_service - INFO - ✅ cheek_r 로드 성공!
+2026-01-12 11:25:42 - services.ai_service - INFO - 🔄 로딩 중: chin (Class:4, Reg:15)
+2026-01-12 11:25:42 - services.ai_service - INFO - ✅ chin 로드 성공!
+2026-01-12 11:25:42 - services.ai_service - INFO - 총 6개 모델 로드 완료
+2026-01-12 12:32:03 - services.ai_service - INFO - --- AI 모델 로딩 시작 ---
+2026-01-12 12:32:03 - services.ai_service - INFO - 🔄 로딩 중: forehead (Class:4, Reg:15)
+2026-01-12 12:32:03 - services.ai_service - INFO - ✅ forehead 로드 성공!
+2026-01-12 12:32:03 - services.ai_service - INFO - 🔄 로딩 중: eye_l (Class:4, Reg:8)
+2026-01-12 12:32:03 - services.ai_service - INFO - ✅ eye_l 로드 성공!
+2026-01-12 12:32:03 - services.ai_service - INFO - 🔄 로딩 중: eye_r (Class:4, Reg:8)
+2026-01-12 12:32:03 - services.ai_service - INFO - ✅ eye_r 로드 성공!
+2026-01-12 12:32:03 - services.ai_service - INFO - 🔄 로딩 중: cheek_l (Class:4, Reg:16)
+2026-01-12 12:32:03 - services.ai_service - INFO - ✅ cheek_l 로드 성공!
+2026-01-12 12:32:03 - services.ai_service - INFO - 🔄 로딩 중: cheek_r (Class:4, Reg:16)
+2026-01-12 12:32:04 - services.ai_service - INFO - ✅ cheek_r 로드 성공!
+2026-01-12 12:32:04 - services.ai_service - INFO - 🔄 로딩 중: chin (Class:4, Reg:15)
+2026-01-12 12:32:04 - services.ai_service - INFO - ✅ chin 로드 성공!
+2026-01-12 12:32:04 - services.ai_service - INFO - 총 6개 모델 로드 완료
+2026-01-12 12:32:10 - services.ai_service - INFO - --- AI 모델 로딩 시작 ---
+2026-01-12 12:32:10 - services.ai_service - INFO - 🔄 로딩 중: forehead (Class:4, Reg:15)
+2026-01-12 12:32:10 - services.ai_service - INFO - ✅ forehead 로드 성공!
+2026-01-12 12:32:10 - services.ai_service - INFO - 🔄 로딩 중: eye_l (Class:4, Reg:8)
+2026-01-12 12:32:10 - services.ai_service - INFO - ✅ eye_l 로드 성공!
+2026-01-12 12:32:10 - services.ai_service - INFO - 🔄 로딩 중: eye_r (Class:4, Reg:8)
+2026-01-12 12:32:10 - services.ai_service - INFO - ✅ eye_r 로드 성공!
+2026-01-12 12:32:10 - services.ai_service - INFO - 🔄 로딩 중: cheek_l (Class:4, Reg:16)
+2026-01-12 12:32:11 - services.ai_service - INFO - ✅ cheek_l 로드 성공!
+2026-01-12 12:32:11 - services.ai_service - INFO - 🔄 로딩 중: cheek_r (Class:4, Reg:16)
+2026-01-12 12:32:11 - services.ai_service - INFO - ✅ cheek_r 로드 성공!
+2026-01-12 12:32:11 - services.ai_service - INFO - 🔄 로딩 중: chin (Class:4, Reg:15)
+2026-01-12 12:32:11 - services.ai_service - INFO - ✅ chin 로드 성공!
+2026-01-12 12:32:11 - services.ai_service - INFO - 총 6개 모델 로드 완료
+2026-01-12 12:34:32 - services.ai_service - INFO - --- AI 모델 로딩 시작 ---
+2026-01-12 12:34:32 - services.ai_service - INFO - 🔄 로딩 중: forehead (Class:4, Reg:15)
+2026-01-12 12:34:32 - services.ai_service - INFO - ✅ forehead 로드 성공!
+2026-01-12 12:34:32 - services.ai_service - INFO - 🔄 로딩 중: eye_l (Class:4, Reg:8)
+2026-01-12 12:34:32 - services.ai_service - INFO - ✅ eye_l 로드 성공!
+2026-01-12 12:34:32 - services.ai_service - INFO - 🔄 로딩 중: eye_r (Class:4, Reg:8)
+2026-01-12 12:34:33 - services.ai_service - INFO - ✅ eye_r 로드 성공!
+2026-01-12 12:34:33 - services.ai_service - INFO - 🔄 로딩 중: cheek_l (Class:4, Reg:16)
+2026-01-12 12:34:33 - services.ai_service - INFO - ✅ cheek_l 로드 성공!
+2026-01-12 12:34:33 - services.ai_service - INFO - 🔄 로딩 중: cheek_r (Class:4, Reg:16)
+2026-01-12 12:34:33 - services.ai_service - INFO - ✅ cheek_r 로드 성공!
+2026-01-12 12:34:33 - services.ai_service - INFO - 🔄 로딩 중: chin (Class:4, Reg:15)
+2026-01-12 12:34:33 - services.ai_service - INFO - ✅ chin 로드 성공!
+2026-01-12 12:34:33 - services.ai_service - INFO - 총 6개 모델 로드 완료
+2026-01-12 12:34:39 - services.ai_service - INFO - --- AI 모델 로딩 시작 ---
+2026-01-12 12:34:39 - services.ai_service - INFO - 🔄 로딩 중: forehead (Class:4, Reg:15)
+2026-01-12 12:34:40 - services.ai_service - INFO - ✅ forehead 로드 성공!
+2026-01-12 12:34:40 - services.ai_service - INFO - 🔄 로딩 중: eye_l (Class:4, Reg:8)
+2026-01-12 12:34:40 - services.ai_service - INFO - ✅ eye_l 로드 성공!
+2026-01-12 12:34:40 - services.ai_service - INFO - 🔄 로딩 중: eye_r (Class:4, Reg:8)
+2026-01-12 12:34:40 - services.ai_service - INFO - ✅ eye_r 로드 성공!
+2026-01-12 12:34:40 - services.ai_service - INFO - 🔄 로딩 중: cheek_l (Class:4, Reg:16)
+2026-01-12 12:34:40 - services.ai_service - INFO - ✅ cheek_l 로드 성공!
+2026-01-12 12:34:40 - services.ai_service - INFO - 🔄 로딩 중: cheek_r (Class:4, Reg:16)
+2026-01-12 12:34:40 - services.ai_service - INFO - ✅ cheek_r 로드 성공!
+2026-01-12 12:34:40 - services.ai_service - INFO - 🔄 로딩 중: chin (Class:4, Reg:15)
+2026-01-12 12:34:41 - services.ai_service - INFO - ✅ chin 로드 성공!
+2026-01-12 12:34:41 - services.ai_service - INFO - 총 6개 모델 로드 완료
+2026-01-12 12:36:02 - services.analysis_service - INFO - 
+==================================================
+2026-01-12 12:36:02 - services.analysis_service - INFO - 📸 [AI 분석 시작] 사용자: user_8eex61z8o | 이미지: (3392, 2544)
+2026-01-12 12:36:02 - services.analysis_service - INFO - ==================================================
+2026-01-12 12:36:02 - services.image_service - INFO - 
+   🔍 [이미지 검증 시작]
+2026-01-12 12:36:02 - services.image_service - INFO -    📏 이미지 크기: 3392x2544
+2026-01-12 12:36:02 - services.image_service - INFO -    💡 평균 밝기: 135.8
+2026-01-12 12:36:02 - services.image_service - INFO - ✅ OpenCV Face Detector 초기화 완료
+2026-01-12 12:36:02 - services.image_service - INFO -    🤖 얼굴 검출 실행 중 (OpenCV)...
+2026-01-12 12:36:02 - services.image_service - WARNING -    ❌ 얼굴이 감지되지 않았습니다
+2026-01-12 12:36:02 - services.analysis_service - ERROR - ❌ 이미지 검증 실패: 얼굴이 감지되지 않았습니다. 정면 사진을 사용해주세요.
+2026-01-12 12:36:11 - services.analysis_service - INFO - 
+==================================================
+2026-01-12 12:36:11 - services.analysis_service - INFO - 📸 [AI 분석 시작] 사용자: user_8eex61z8o | 이미지: (2316, 3088)
+2026-01-12 12:36:11 - services.analysis_service - INFO - ==================================================
+2026-01-12 12:36:11 - services.image_service - INFO - 
+   🔍 [이미지 검증 시작]
+2026-01-12 12:36:11 - services.image_service - INFO -    📏 이미지 크기: 2316x3088
+2026-01-12 12:36:12 - services.image_service - INFO -    💡 평균 밝기: 144.7
+2026-01-12 12:36:12 - services.image_service - INFO -    🤖 얼굴 검출 실행 중 (OpenCV)...
+2026-01-12 12:36:12 - services.image_service - INFO -    ✅ 1개의 얼굴 감지
+2026-01-12 12:36:12 - services.image_service - INFO -    ✅ 이미지 검증 통과
+2026-01-12 12:36:12 - services.analysis_service - INFO - 
+   🤖 [AI 분석 시작]
+2026-01-12 12:36:12 - services.analysis_service - INFO -    ✅ forehead: Grade 0, Score 87.0
+2026-01-12 12:36:12 - services.analysis_service - INFO -    ✅ eye_l: Grade 3, Score 31.8
+2026-01-12 12:36:12 - services.analysis_service - INFO -    ✅ eye_r: Grade 0, Score 87.7
+2026-01-12 12:36:12 - services.analysis_service - INFO -    ✅ cheek_l: Grade 0, Score 80.7
+2026-01-12 12:36:12 - services.analysis_service - INFO -    ✅ cheek_r: Grade 0, Score 85.3
+2026-01-12 12:36:12 - services.analysis_service - INFO -    ✅ chin: Grade 0, Score 85.5
+2026-01-12 12:36:12 - services.analysis_service - INFO - 
+   📊 전체 점수: 76.3/100
+2026-01-12 12:36:12 - services.analysis_service - INFO -    💡 LED 추천: RED 모드 (20분)
+2026-01-12 12:36:12 - services.analysis_service - INFO - ==================================================
+
+2026-01-12 12:36:12 - services.history_service - INFO - 📝 히스토리 저장 완료: user_8eex61z8o - 점수 76.3
+2026-01-12 12:36:47 - services.analysis_service - INFO - 
+==================================================
+2026-01-12 12:36:47 - services.analysis_service - INFO - 📸 [AI 분석 시작] 사용자: user_8eex61z8o | 이미지: (3392, 2544)
+2026-01-12 12:36:47 - services.analysis_service - INFO - ==================================================
+2026-01-12 12:36:47 - services.image_service - INFO - 
+   🔍 [이미지 검증 시작]
+2026-01-12 12:36:47 - services.image_service - INFO -    📏 이미지 크기: 3392x2544
+2026-01-12 12:36:47 - services.image_service - INFO -    💡 평균 밝기: 118.7
+2026-01-12 12:36:47 - services.image_service - INFO -    🤖 얼굴 검출 실행 중 (OpenCV)...
+2026-01-12 12:36:48 - services.image_service - INFO -    ✅ 2개의 얼굴 감지
+2026-01-12 12:36:48 - services.image_service - WARNING -    ⚠️ 여러 얼굴(2개)이 감지되었습니다. 중앙에 위치한 얼굴을 기준으로 분석합니다.
+2026-01-12 12:36:48 - services.image_service - INFO -    ✅ 이미지 검증 통과
+2026-01-12 12:36:48 - services.analysis_service - INFO - 
+   🤖 [AI 분석 시작]
+2026-01-12 12:36:48 - services.analysis_service - INFO -    ✅ forehead: Grade 1, Score 65.6
+2026-01-12 12:36:48 - services.analysis_service - INFO -    ✅ eye_l: Grade 0, Score 85.5
+2026-01-12 12:36:48 - services.analysis_service - INFO -    ✅ eye_r: Grade 1, Score 69.4
+2026-01-12 12:36:48 - services.analysis_service - INFO -    ✅ cheek_l: Grade 0, Score 81.9
+2026-01-12 12:36:48 - services.analysis_service - INFO -    ✅ cheek_r: Grade 1, Score 69.3
+2026-01-12 12:36:48 - services.analysis_service - INFO -    ✅ chin: Grade 0, Score 87.0
+2026-01-12 12:36:48 - services.analysis_service - INFO - 
+   📊 전체 점수: 76.5/100
+2026-01-12 12:36:48 - services.analysis_service - INFO -    💡 LED 추천: RED 모드 (15분)
+2026-01-12 12:36:48 - services.analysis_service - INFO - ==================================================
+
+2026-01-12 12:36:48 - services.history_service - INFO - 📝 히스토리 저장 완료: user_8eex61z8o - 점수 76.5
+2026-01-12 12:37:38 - services.analysis_service - INFO - 
+==================================================
+2026-01-12 12:37:38 - services.analysis_service - INFO - 📸 [AI 분석 시작] 사용자: user_8eex61z8o | 이미지: (3392, 2544)
+2026-01-12 12:37:38 - services.analysis_service - INFO - ==================================================
+2026-01-12 12:37:38 - services.image_service - INFO - 
+   🔍 [이미지 검증 시작]
+2026-01-12 12:37:38 - services.image_service - INFO -    📏 이미지 크기: 3392x2544
+2026-01-12 12:37:38 - services.image_service - INFO -    💡 평균 밝기: 118.7
+2026-01-12 12:37:38 - services.image_service - INFO -    🤖 얼굴 검출 실행 중 (OpenCV)...
+2026-01-12 12:37:39 - services.image_service - INFO -    ✅ 2개의 얼굴 감지
+2026-01-12 12:37:39 - services.image_service - WARNING -    ⚠️ 여러 얼굴(2개)이 감지되었습니다. 중앙에 위치한 얼굴을 기준으로 분석합니다.
+2026-01-12 12:37:39 - services.image_service - INFO -    ✅ 이미지 검증 통과
+2026-01-12 12:37:39 - services.analysis_service - INFO - 
+   🤖 [AI 분석 시작]
+2026-01-12 12:37:39 - services.analysis_service - INFO -    ✅ forehead: Grade 1, Score 65.6
+2026-01-12 12:37:39 - services.analysis_service - INFO -    ✅ eye_l: Grade 0, Score 85.5
+2026-01-12 12:37:39 - services.analysis_service - INFO -    ✅ eye_r: Grade 1, Score 69.4
+2026-01-12 12:37:39 - services.analysis_service - INFO -    ✅ cheek_l: Grade 0, Score 81.9
+2026-01-12 12:37:39 - services.analysis_service - INFO -    ✅ cheek_r: Grade 1, Score 69.3
+2026-01-12 12:37:39 - services.analysis_service - INFO -    ✅ chin: Grade 0, Score 87.0
+2026-01-12 12:37:39 - services.analysis_service - INFO - 
+   📊 전체 점수: 76.5/100
+2026-01-12 12:37:39 - services.analysis_service - INFO -    💡 LED 추천: RED 모드 (15분)
+2026-01-12 12:37:39 - services.analysis_service - INFO - ==================================================
+
+2026-01-12 12:37:39 - services.history_service - INFO - 📝 히스토리 저장 완료: user_8eex61z8o - 점수 76.5
+2026-01-12 12:38:09 - services.serial_service - INFO - 시리얼 포트 스캔 시작
+2026-01-12 12:38:09 - services.serial_service - INFO - 발견된 포트: COM5 - SAMSUNG Mobile USB Modem
+2026-01-12 12:38:09 - services.serial_service - INFO - 1개의 시리얼 포트 발견
+2026-01-12 12:38:09 - services.serial_service - INFO - 첫 번째 포트 선택: COM5
+2026-01-12 12:38:09 - services.serial_service - INFO - 시리얼 포트 연결 시도: COM5 @ 115200 baud
+2026-01-12 12:38:11 - services.serial_service - INFO - 시리얼 포트 연결 성공: COM5
+2026-01-12 12:38:30 - services.analysis_service - INFO - 
+==================================================
+2026-01-12 12:38:30 - services.analysis_service - INFO - 📸 [AI 분석 시작] 사용자: user_8eex61z8o | 이미지: (2316, 3088)
+2026-01-12 12:38:30 - services.analysis_service - INFO - ==================================================
+2026-01-12 12:38:30 - services.image_service - INFO - 
+   🔍 [이미지 검증 시작]
+2026-01-12 12:38:30 - services.image_service - INFO -    📏 이미지 크기: 2316x3088
+2026-01-12 12:38:30 - services.image_service - INFO -    💡 평균 밝기: 139.4
+2026-01-12 12:38:30 - services.image_service - INFO -    🤖 얼굴 검출 실행 중 (OpenCV)...
+2026-01-12 12:38:30 - services.image_service - WARNING -    ❌ 얼굴이 감지되지 않았습니다
+2026-01-12 12:38:30 - services.analysis_service - ERROR - ❌ 이미지 검증 실패: 얼굴이 감지되지 않았습니다. 정면 사진을 사용해주세요.
+2026-01-12 12:38:44 - services.analysis_service - INFO - 
+==================================================
+2026-01-12 12:38:44 - services.analysis_service - INFO - 📸 [AI 분석 시작] 사용자: user_8eex61z8o | 이미지: (3392, 2544)
+2026-01-12 12:38:44 - services.analysis_service - INFO - ==================================================
+2026-01-12 12:38:44 - services.image_service - INFO - 
+   🔍 [이미지 검증 시작]
+2026-01-12 12:38:44 - services.image_service - INFO -    📏 이미지 크기: 3392x2544
+2026-01-12 12:38:44 - services.image_service - INFO -    💡 평균 밝기: 118.7
+2026-01-12 12:38:44 - services.image_service - INFO -    🤖 얼굴 검출 실행 중 (OpenCV)...
+2026-01-12 12:38:44 - services.image_service - INFO -    ✅ 2개의 얼굴 감지
+2026-01-12 12:38:44 - services.image_service - WARNING -    ⚠️ 여러 얼굴(2개)이 감지되었습니다. 중앙에 위치한 얼굴을 기준으로 분석합니다.
+2026-01-12 12:38:44 - services.image_service - INFO -    ✅ 이미지 검증 통과
+2026-01-12 12:38:44 - services.analysis_service - INFO - 
+   🤖 [AI 분석 시작]
+2026-01-12 12:38:44 - services.analysis_service - INFO -    ✅ forehead: Grade 1, Score 65.6
+2026-01-12 12:38:44 - services.analysis_service - INFO -    ✅ eye_l: Grade 0, Score 85.5
+2026-01-12 12:38:44 - services.analysis_service - INFO -    ✅ eye_r: Grade 1, Score 69.4
+2026-01-12 12:38:44 - services.analysis_service - INFO -    ✅ cheek_l: Grade 0, Score 81.9
+2026-01-12 12:38:44 - services.analysis_service - INFO -    ✅ cheek_r: Grade 1, Score 69.3
+2026-01-12 12:38:44 - services.analysis_service - INFO -    ✅ chin: Grade 0, Score 87.0
+2026-01-12 12:38:44 - services.analysis_service - INFO - 
+   📊 전체 점수: 76.5/100
+2026-01-12 12:38:44 - services.analysis_service - INFO -    💡 LED 추천: RED 모드 (15분)
+2026-01-12 12:38:44 - services.analysis_service - INFO - ==================================================
+
+2026-01-12 12:38:44 - services.history_service - INFO - 📝 히스토리 저장 완료: user_8eex61z8o - 점수 76.5
