@@ -1555,28 +1555,60 @@
         async function connectBle() {
             try {
                 console.log('=== connectBle 함수 호출됨 ===');
-                console.log('CONFIG.API_BASE_URL:', CONFIG.API_BASE_URL);
                 showToast('BLE 디바이스 연결 중...', 'info');
 
-                const apiUrl = `${CONFIG.API_BASE_URL}/api/v1/ble/connect`;
-                console.log('BLE API 호출 URL:', apiUrl);
+                // 모바일 앱인지 웹인지 확인
+                const isMobileApp = typeof cordova !== 'undefined' && cordovaBLE;
 
-                // 백엔드 API로 BLE 연결 요청
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({})  // 자동으로 MySkin_LED_Mask 검색
-                });
+                if (isMobileApp) {
+                    // 모바일: Cordova BLE 플러그인 직접 사용
+                    console.log('모바일 앱: Cordova BLE 직접 연결');
 
-                const data = await response.json();
+                    // BLE 디바이스 스캔
+                    const devices = await cordovaBLE.scan(10);
 
-                if (data.success) {
+                    if (devices.length === 0) {
+                        throw new Error('BLE 디바이스를 찾을 수 없습니다. LED 마스크의 전원을 확인해주세요.');
+                    }
+
+                    // 첫 번째 발견된 디바이스에 연결
+                    const device = devices[0];
+                    await cordovaBLE.connect(device.id);
+
                     state.connected = true;
-                    state.bleDeviceName = 'MySkin_LED_Mask';
+                    state.bleDeviceName = device.name || 'MySkin_LED_Mask';
                     updateBleStatus(true, state.bleDeviceName);
                     showToast('BLE 디바이스 연결 성공!', 'success');
                 } else {
-                    throw new Error(data.message || '연결 실패');
+                    // 웹: 백엔드 API 사용 (기존 방식)
+                    console.log('웹 버전: 백엔드 API 연결');
+                    console.log('CONFIG.API_BASE_URL:', CONFIG.API_BASE_URL);
+
+                    const apiUrl = `${CONFIG.API_BASE_URL}/api/v1/ble/connect`;
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({})
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Mock/SERIAL 모드 체크
+                        if (data.mode === 'mock' || data.is_mock || data.mode === 'SERIAL' || data.is_serial) {
+                            showToast('실제 디바이스가 연결되어 있지 않습니다.', 'warning');
+                            state.connected = false;
+                            updateBleStatus(false);
+                            return;
+                        }
+
+                        state.connected = true;
+                        state.bleDeviceName = data.device_name || 'MySkin_LED_Mask';
+                        updateBleStatus(true, state.bleDeviceName);
+                        showToast('BLE 디바이스 연결 성공!', 'success');
+                    } else {
+                        throw new Error(data.message || '연결 실패');
+                    }
                 }
             } catch (error) {
                 console.error('BLE 연결 오류:', error);
@@ -1591,13 +1623,23 @@
                 // 연결 해제 시 모든 동작 정지
                 stopTherapy(false);
 
-                // 백엔드 API로 연결 해제 요청
-                const response = await fetch(`${CONFIG.API_BASE_URL}/api/v1/ble/disconnect`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
-                });
+                // 모바일 앱인지 웹인지 확인
+                const isMobileApp = typeof cordova !== 'undefined' && cordovaBLE;
 
-                const data = await response.json();
+                if (isMobileApp) {
+                    // 모바일: Cordova BLE 직접 연결 해제
+                    console.log('모바일 앱: Cordova BLE 직접 연결 해제');
+                    await cordovaBLE.disconnect();
+                } else {
+                    // 웹: 백엔드 API로 연결 해제 요청
+                    console.log('웹 버전: 백엔드 API 연결 해제');
+                    const response = await fetch(`${CONFIG.API_BASE_URL}/api/v1/ble/disconnect`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+
+                    const data = await response.json();
+                }
 
                 state.connected = false;
                 state.bleDeviceName = '';
@@ -1620,35 +1662,61 @@
                 // 명령어 파싱 (예: "START:RED:20")
                 const parts = command.split(':');
 
-                if (parts[0] === 'START' && parts.length === 3) {
-                    const mode = parts[1].toLowerCase();
-                    const duration = parseInt(parts[2]);
+                // 모바일 앱인지 웹인지 확인
+                const isMobileApp = typeof cordova !== 'undefined' && cordovaBLE;
 
-                    const response = await fetch(`${CONFIG.API_BASE_URL}/api/v1/ble/therapy/start`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ mode, duration })
-                    });
+                if (isMobileApp) {
+                    // 모바일: Cordova BLE 플러그인으로 직접 명령 전송
+                    console.log('모바일 앱: Cordova BLE 직접 명령 전송:', command);
 
-                    const data = await response.json();
-                    if (!data.success) {
-                        throw new Error(data.message || '명령 전송 실패');
+                    if (parts[0] === 'START' && parts.length === 3) {
+                        const mode = parts[1].toUpperCase();
+                        const duration = parseInt(parts[2]);
+
+                        await cordovaBLE.sendLEDCommand(mode, duration);
+                        console.log("LED 테라피 시작:", mode, duration);
+
+                    } else if (parts[0] === 'STOP') {
+                        // STOP 명령은 단순히 문자열로 전송
+                        await cordovaBLE.sendLEDCommand('STOP', 0);
+                        console.log("LED 테라피 중지");
+                    } else {
+                        console.log("알 수 없는 명령:", command);
                     }
-                    console.log("LED 테라피 시작:", data);
-
-                } else if (parts[0] === 'STOP') {
-                    const response = await fetch(`${CONFIG.API_BASE_URL}/api/v1/ble/therapy/stop`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' }
-                    });
-
-                    const data = await response.json();
-                    if (!data.success) {
-                        throw new Error(data.message || '중지 실패');
-                    }
-                    console.log("LED 테라피 중지:", data);
                 } else {
-                    console.log("알 수 없는 명령:", command);
+                    // 웹: 백엔드 API 사용
+                    console.log('웹 버전: 백엔드 API 명령 전송:', command);
+
+                    if (parts[0] === 'START' && parts.length === 3) {
+                        const mode = parts[1].toLowerCase();
+                        const duration = parseInt(parts[2]);
+
+                        const response = await fetch(`${CONFIG.API_BASE_URL}/api/v1/ble/therapy/start`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ mode, duration })
+                        });
+
+                        const data = await response.json();
+                        if (!data.success) {
+                            throw new Error(data.message || '명령 전송 실패');
+                        }
+                        console.log("LED 테라피 시작:", data);
+
+                    } else if (parts[0] === 'STOP') {
+                        const response = await fetch(`${CONFIG.API_BASE_URL}/api/v1/ble/therapy/stop`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' }
+                        });
+
+                        const data = await response.json();
+                        if (!data.success) {
+                            throw new Error(data.message || '중지 실패');
+                        }
+                        console.log("LED 테라피 중지:", data);
+                    } else {
+                        console.log("알 수 없는 명령:", command);
+                    }
                 }
 
             } catch (error) {

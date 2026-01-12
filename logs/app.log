@@ -3288,3 +3288,79 @@
 2026-01-12 13:25:27 - services.serial_service - INFO - 첫 번째 포트 선택: COM5
 2026-01-12 13:25:27 - services.serial_service - INFO - 시리얼 포트 연결 시도: COM5 @ 115200 baud
 2026-01-12 13:25:29 - services.serial_service - INFO - 시리얼 포트 연결 성공: COM5
+2026-01-12 13:30:09 - services.ai_service - INFO - --- AI 모델 로딩 시작 ---
+2026-01-12 13:30:09 - services.ai_service - INFO - 🔄 로딩 중: forehead (Class:4, Reg:15)
+2026-01-12 13:30:09 - services.ai_service - INFO - ✅ forehead 로드 성공!
+2026-01-12 13:30:09 - services.ai_service - INFO - 🔄 로딩 중: eye_l (Class:4, Reg:8)
+2026-01-12 13:30:09 - services.ai_service - INFO - ✅ eye_l 로드 성공!
+2026-01-12 13:30:09 - services.ai_service - INFO - 🔄 로딩 중: eye_r (Class:4, Reg:8)
+2026-01-12 13:30:09 - services.ai_service - INFO - ✅ eye_r 로드 성공!
+2026-01-12 13:30:09 - services.ai_service - INFO - 🔄 로딩 중: cheek_l (Class:4, Reg:16)
+2026-01-12 13:30:10 - services.ai_service - INFO - ✅ cheek_l 로드 성공!
+2026-01-12 13:30:10 - services.ai_service - INFO - 🔄 로딩 중: cheek_r (Class:4, Reg:16)
+2026-01-12 13:30:10 - services.ai_service - INFO - ✅ cheek_r 로드 성공!
+2026-01-12 13:30:10 - services.ai_service - INFO - 🔄 로딩 중: chin (Class:4, Reg:15)
+2026-01-12 13:30:10 - services.ai_service - INFO - ✅ chin 로드 성공!
+2026-01-12 13:30:10 - services.ai_service - INFO - 총 6개 모델 로드 완료
+2026-01-12 13:30:16 - services.ai_service - INFO - --- AI 모델 로딩 시작 ---
+2026-01-12 13:30:16 - services.ai_service - INFO - 🔄 로딩 중: forehead (Class:4, Reg:15)
+2026-01-12 13:30:16 - services.ai_service - INFO - ✅ forehead 로드 성공!
+2026-01-12 13:30:16 - services.ai_service - INFO - 🔄 로딩 중: eye_l (Class:4, Reg:8)
+2026-01-12 13:30:16 - services.ai_service - INFO - ✅ eye_l 로드 성공!
+2026-01-12 13:30:16 - services.ai_service - INFO - 🔄 로딩 중: eye_r (Class:4, Reg:8)
+2026-01-12 13:30:17 - services.ai_service - INFO - ✅ eye_r 로드 성공!
+2026-01-12 13:30:17 - services.ai_service - INFO - 🔄 로딩 중: cheek_l (Class:4, Reg:16)
+2026-01-12 13:30:17 - services.ai_service - INFO - ✅ cheek_l 로드 성공!
+2026-01-12 13:30:17 - services.ai_service - INFO - 🔄 로딩 중: cheek_r (Class:4, Reg:16)
+2026-01-12 13:30:17 - services.ai_service - INFO - ✅ cheek_r 로드 성공!
+2026-01-12 13:30:17 - services.ai_service - INFO - 🔄 로딩 중: chin (Class:4, Reg:15)
+2026-01-12 13:30:17 - services.ai_service - INFO - ✅ chin 로드 성공!
+2026-01-12 13:30:17 - services.ai_service - INFO - 총 6개 모델 로드 완료
+2026-01-12 13:30:28 - services.serial_service - INFO - 시리얼 포트 스캔 시작
+2026-01-12 13:30:28 - services.serial_service - INFO - 발견된 포트: COM5 - SAMSUNG Mobile USB Modem
+2026-01-12 13:30:28 - services.serial_service - INFO - 1개의 시리얼 포트 발견
+2026-01-12 13:30:28 - services.serial_service - INFO - 첫 번째 포트 선택: COM5
+2026-01-12 13:30:28 - services.serial_service - INFO - 시리얼 포트 연결 시도: COM5 @ 115200 baud
+2026-01-12 13:30:30 - services.serial_service - INFO - 시리얼 포트 연결 성공: COM5
+2026-01-12 13:31:46 - services.ai_service - INFO - --- AI 모델 로딩 시작 ---
+2026-01-12 13:31:46 - services.ai_service - INFO - 🔄 로딩 중: forehead (Class:4, Reg:15)
+2026-01-12 13:31:46 - services.ai_service - INFO - ✅ forehead 로드 성공!
+2026-01-12 13:31:46 - services.ai_service - INFO - 🔄 로딩 중: eye_l (Class:4, Reg:8)
+2026-01-12 13:31:46 - services.ai_service - INFO - ✅ eye_l 로드 성공!
+2026-01-12 13:31:46 - services.ai_service - INFO - 🔄 로딩 중: eye_r (Class:4, Reg:8)
+2026-01-12 13:31:47 - services.ai_service - INFO - ✅ eye_r 로드 성공!
+2026-01-12 13:31:47 - services.ai_service - INFO - 🔄 로딩 중: cheek_l (Class:4, Reg:16)
+2026-01-12 13:31:47 - services.ai_service - INFO - ✅ cheek_l 로드 성공!
+2026-01-12 13:31:47 - services.ai_service - INFO - 🔄 로딩 중: cheek_r (Class:4, Reg:16)
+2026-01-12 13:31:47 - services.ai_service - INFO - ✅ cheek_r 로드 성공!
+2026-01-12 13:31:47 - services.ai_service - INFO - 🔄 로딩 중: chin (Class:4, Reg:15)
+2026-01-12 13:31:47 - services.ai_service - INFO - ✅ chin 로드 성공!
+2026-01-12 13:31:47 - services.ai_service - INFO - 총 6개 모델 로드 완료
+2026-01-12 13:32:14 - services.ai_service - INFO - --- AI 모델 로딩 시작 ---
+2026-01-12 13:32:14 - services.ai_service - INFO - 🔄 로딩 중: forehead (Class:4, Reg:15)
+2026-01-12 13:32:14 - services.ai_service - INFO - ✅ forehead 로드 성공!
+2026-01-12 13:32:14 - services.ai_service - INFO - 🔄 로딩 중: eye_l (Class:4, Reg:8)
+2026-01-12 13:32:14 - services.ai_service - INFO - ✅ eye_l 로드 성공!
+2026-01-12 13:32:14 - services.ai_service - INFO - 🔄 로딩 중: eye_r (Class:4, Reg:8)
+2026-01-12 13:32:14 - services.ai_service - INFO - ✅ eye_r 로드 성공!
+2026-01-12 13:32:14 - services.ai_service - INFO - 🔄 로딩 중: cheek_l (Class:4, Reg:16)
+2026-01-12 13:32:14 - services.ai_service - INFO - ✅ cheek_l 로드 성공!
+2026-01-12 13:32:14 - services.ai_service - INFO - 🔄 로딩 중: cheek_r (Class:4, Reg:16)
+2026-01-12 13:32:15 - services.ai_service - INFO - ✅ cheek_r 로드 성공!
+2026-01-12 13:32:15 - services.ai_service - INFO - 🔄 로딩 중: chin (Class:4, Reg:15)
+2026-01-12 13:32:15 - services.ai_service - INFO - ✅ chin 로드 성공!
+2026-01-12 13:32:15 - services.ai_service - INFO - 총 6개 모델 로드 완료
+2026-01-12 13:32:21 - services.ai_service - INFO - --- AI 모델 로딩 시작 ---
+2026-01-12 13:32:21 - services.ai_service - INFO - 🔄 로딩 중: forehead (Class:4, Reg:15)
+2026-01-12 13:32:21 - services.ai_service - INFO - ✅ forehead 로드 성공!
+2026-01-12 13:32:21 - services.ai_service - INFO - 🔄 로딩 중: eye_l (Class:4, Reg:8)
+2026-01-12 13:32:21 - services.ai_service - INFO - ✅ eye_l 로드 성공!
+2026-01-12 13:32:21 - services.ai_service - INFO - 🔄 로딩 중: eye_r (Class:4, Reg:8)
+2026-01-12 13:32:21 - services.ai_service - INFO - ✅ eye_r 로드 성공!
+2026-01-12 13:32:21 - services.ai_service - INFO - 🔄 로딩 중: cheek_l (Class:4, Reg:16)
+2026-01-12 13:32:21 - services.ai_service - INFO - ✅ cheek_l 로드 성공!
+2026-01-12 13:32:21 - services.ai_service - INFO - 🔄 로딩 중: cheek_r (Class:4, Reg:16)
+2026-01-12 13:32:22 - services.ai_service - INFO - ✅ cheek_r 로드 성공!
+2026-01-12 13:32:22 - services.ai_service - INFO - 🔄 로딩 중: chin (Class:4, Reg:15)
+2026-01-12 13:32:22 - services.ai_service - INFO - ✅ chin 로드 성공!
+2026-01-12 13:32:22 - services.ai_service - INFO - 총 6개 모델 로드 완료

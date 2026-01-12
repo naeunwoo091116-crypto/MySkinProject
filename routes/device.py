@@ -104,11 +104,25 @@ def connect_ble_device():
     data = request.get_json() or {}
     service = get_device_service()
 
+    # Mock 또는 SERIAL 모드인 경우 실제 LED 디바이스가 없으므로 연결 실패
+    if CONNECTION_MODE == "MOCK":
+        return jsonify({
+            "success": False,
+            "message": "실제 디바이스가 연결되어 있지 않습니다. USB 또는 BLE 디바이스를 연결해주세요.",
+            "mode": CONNECTION_MODE,
+            "is_mock": True
+        }), 400
+
+    # SERIAL 모드는 보통 휴대폰 USB 모뎀이므로 연결 거부
     if CONNECTION_MODE == "SERIAL":
-        port = data.get('port')
-        success = service.connect(port)
-        address = service.port_name if success else None
-    elif CONNECTION_MODE in ["BLE", "MOCK"]:
+        return jsonify({
+            "success": False,
+            "message": "LED 마스크가 연결되어 있지 않습니다. BLE 디바이스를 사용해주세요.",
+            "mode": CONNECTION_MODE,
+            "is_serial": True
+        }), 400
+
+    if CONNECTION_MODE == "BLE":
         address = data.get('address')
         success = asyncio.run(service.connect(address))
         address = getattr(service, 'device_address', None)
@@ -121,7 +135,8 @@ def connect_ble_device():
             "success": True,
             "message": f"디바이스 연결 성공 ({CONNECTION_MODE} 모드)",
             "address": address,
-            "mode": CONNECTION_MODE
+            "mode": CONNECTION_MODE,
+            "device_name": getattr(service, 'device_name', 'MySkin_LED_Mask')
         })
     else:
         return jsonify({
