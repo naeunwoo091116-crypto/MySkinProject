@@ -18,6 +18,9 @@ except ImportError:
 # 데이터베이스 설정
 DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://postgres:password@localhost/skin_analysis')
 
+# GPU 서버 URL (설정되어 있으면 원격 추론 사용)
+GPU_SERVER_URL = os.getenv('GPU_SERVER_URL')
+
 # 프로젝트 루트 디렉토리 (절대 경로 계산)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 

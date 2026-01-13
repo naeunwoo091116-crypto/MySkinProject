@@ -1,101 +1,59 @@
-"""
-원격 GPU 서버 AI 추론 서비스
-GPU 서버의 inference API를 호출하여 AI 분석 수행
-"""
 import requests
+import logging
+import base64
 import io
 from PIL import Image
-from core.logger import setup_logger
-import os
+from core.config import GPU_SERVER_URL, MODEL_CONFIGS
 
-logger = setup_logger(__name__)
-
+logger = logging.getLogger(__name__)
 
 class RemoteAIService:
-    """원격 GPU 서버 AI 서비스"""
+    """원격 GPU 서버를 통한 AI 모델 추론 서비스"""
 
     def __init__(self):
-        # 환경 변수에서 GPU 서버 URL 가져오기
-        self.gpu_server_url = os.getenv('GPU_SERVER_URL', 'http://localhost:8000')
-        self.api_key = os.getenv('GPU_API_KEY', '')
-        logger.info(f"🌐 Remote AI Service initialized: {self.gpu_server_url}")
+        self.base_url = GPU_SERVER_URL.rstrip('/')
+        self.models = MODEL_CONFIGS # AnalysisService에서 models.keys()를 순회할 때 필요함 (실제 모델은 로드하지 않음)
+        logger.info(f"Using Remote AI Service at {self.base_url}")
 
     def predict_all_regions(self, pil_image):
         """
-        원격 GPU 서버에서 모든 부위 분석
-
-        Args:
-            pil_image: PIL Image 객체
-
-        Returns:
-            dict: {zone: {cls_output, reg_output}}
+        원격 GPU 서버에 모든 부위 예측 요청
         """
         try:
-            # 이미지를 바이트로 변환
+            # 이미지 바이트 변환
             img_byte_arr = io.BytesIO()
             pil_image.save(img_byte_arr, format='JPEG')
-            img_byte_arr.seek(0)
+            img_byte_arr = img_byte_arr.getvalue()
 
-            # GPU 서버 API 호출
-            files = {'file': ('image.jpg', img_byte_arr, 'image/jpeg')}
-            headers = {}
-            if self.api_key:
-                headers['X-API-Key'] = self.api_key
+            files = {
+                'file': ('image.jpg', img_byte_arr, 'image/jpeg')
+            }
 
-            logger.info(f"📡 Calling GPU server: {self.gpu_server_url}/api/v1/inference")
-            response = requests.post(
-                f"{self.gpu_server_url}/api/v1/inference",
-                files=files,
-                headers=headers,
-                timeout=30
-            )
-
-            if response.status_code != 200:
-                try:
-                    error_data = response.json()
-                    error_msg = error_data.get('message', error_data.get('error', 'Unknown error'))
-                    logger.error(f"❌ GPU server error ({response.status_code}): {error_msg}")
-                    logger.error(f"Full response: {error_data}")
-                except:
-                    logger.error(f"❌ GPU server error ({response.status_code}): {response.text}")
-                raise Exception(f"GPU server error ({response.status_code}): {error_msg if 'error_msg' in locals() else response.text}")
-
-            result = response.json()
-            logger.info(f"✅ GPU inference completed on {result.get('device', 'unknown')}")
-
-            return result['predictions']
-
-        except requests.exceptions.Timeout:
-            logger.error("⏱️ GPU server timeout")
-            raise Exception("GPU 서버 응답 시간 초과")
-        except requests.exceptions.ConnectionError:
-            logger.error(f"🔌 GPU server connection failed: {self.gpu_server_url}")
-            raise Exception(f"GPU 서버 연결 실패: {self.gpu_server_url}")
-        except Exception as e:
-            logger.error(f"❌ Remote AI inference error: {e}")
-            raise
-
-    def health_check(self):
-        """GPU 서버 상태 확인"""
-        try:
-            response = requests.get(
-                f"{self.gpu_server_url}/api/v1/health",
-                timeout=5
-            )
+            logger.info("📡 Sending inference request to GPU server...")
+            response = requests.post(f"{self.base_url}/api/v1/inference", files=files, timeout=30)
+            
             if response.status_code == 200:
-                return response.json()
-            return {"status": "error", "message": f"HTTP {response.status_code}"}
+                result = response.json()
+                if result.get("success"):
+                    logger.info("✅ Remote inference successful")
+                    return result["predictions"]
+                else:
+                    raise Exception(f"GPU Server Error: {result}")
+            else:
+                raise Exception(f"HTTP {response.status_code}: {response.text}")
+
         except Exception as e:
-            return {"status": "error", "message": str(e)}
+            logger.error(f"❌ Remote inference failed: {e}")
+            raise e
 
+    def preprocess_image(self, pil_image):
+        """AnalysisService 호환성 유지용 (원격에서는 사용 안 함)"""
+        return None 
 
-# 싱글톤 인스턴스
-_remote_ai_service_instance = None
+    def predict(self, *args, **kwargs):
+        """AnalysisService 호환성 유지용 (에러 발생)"""
+        raise NotImplementedError("Remote service primarily uses predict_all_regions")
 
-
+# Singleton (Mocking get_ai_service behaviors if needed directly, though usually called via factory)
 def get_remote_ai_service():
-    """Remote AI 서비스 싱글톤 인스턴스 반환"""
-    global _remote_ai_service_instance
-    if _remote_ai_service_instance is None:
-        _remote_ai_service_instance = RemoteAIService()
-    return _remote_ai_service_instance
+    return RemoteAIService()

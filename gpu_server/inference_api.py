@@ -63,13 +63,14 @@ def inference():
         image_bytes = file.read()
         pil_image = Image.open(io.BytesIO(image_bytes)).convert('RGB')
 
-        # 2. 이미지 검증 (얼굴 감지)
-        is_valid, message = image_service.validate_image(pil_image)
-        if not is_valid:
-            return jsonify({
-                "error": "invalid_image",
-                "message": message
-            }), 400
+        # 2. 이미지 검증 (얼굴 감지) - GPU 서버에서는 스킵
+        # Render 서버에서 이미 검증했으므로 생략
+        # is_valid, message = image_service.validate_image(pil_image)
+        # if not is_valid:
+        #     return jsonify({
+        #         "error": "invalid_image",
+        #         "message": message
+        #     }), 400
 
         # 3. AI 모델 추론 (GPU에서 실행)
         predictions = ai_service.predict_all_regions(pil_image)
