@@ -41,9 +41,12 @@ class ImageService:
             logger.error("   MediaPipe 모델 파일이 필요합니다. detector.tflite 파일을 다운로드해주세요.")
             return None
 
-    def validate_image(self, pil_image):
+    def validate_image(self, pil_image, skip_face_detection=False):
         """
         이미지 유효성 검증 (엄격한 얼굴 인식)
+
+        Args:
+            skip_face_detection: True면 얼굴 감지 스킵 (Render 서버용)
         """
         logger.info("\n   🔍 [이미지 검증 시작]")
 
@@ -66,6 +69,12 @@ class ImageService:
                 return False, "이미지가 너무 어둡습니다"
             if mean_brightness > MAX_BRIGHTNESS:
                 return False, "이미지가 너무 밝습니다"
+
+            # 얼굴 감지 스킵 모드 (Render 서버용)
+            if skip_face_detection:
+                logger.info("   ⏭️ 얼굴 감지 스킵 (기본 검증만 수행)")
+                logger.info("   ✅ 이미지 검증 통과")
+                return True, "OK"
 
             # 4. 얼굴 검출 (MediaPipe)
             detector = self._get_face_detector()

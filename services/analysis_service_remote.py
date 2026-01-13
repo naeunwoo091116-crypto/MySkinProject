@@ -39,8 +39,8 @@ class RemoteAnalysisService:
         logger.info(f"📸 [Remote AI 분석 시작] 사용자: {user_id} | 이미지: {pil_image.size}")
         logger.info(f"{'='*50}")
 
-        # 1. 이미지 유효성 검증 (로컬에서 빠르게 수행)
-        is_valid, reason = self.image_service.validate_image(pil_image)
+        # 1. 이미지 유효성 검증 (기본 검증만, MediaPipe 스킵)
+        is_valid, reason = self.image_service.validate_image(pil_image, skip_face_detection=True)
         if not is_valid:
             logger.error(f"❌ 이미지 검증 실패: {reason}")
             raise ValueError(reason)
