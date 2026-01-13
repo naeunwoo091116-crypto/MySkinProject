@@ -33,10 +33,10 @@ class RemoteChatbotService:
 
             logger.info("📡 Sending chatbot request to GPU server...")
             response = requests.post(
-                f"{self.base_url}/api/v1/chatbot", 
-                data=data, 
+                f"{self.base_url}/api/v1/chatbot",
+                data=data,
                 files=files if files else None,
-                timeout=60 # Chatbot might take longer
+                timeout=300 # LLaVA 모델 응답 시간: 최대 5분
             )
             
             if response.status_code == 200:
