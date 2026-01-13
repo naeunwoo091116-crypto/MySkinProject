@@ -428,6 +428,16 @@
             font-size: 15px;
         }
 
+        .btn-third {
+            flex: 1;
+            padding: 14px 8px;
+            border-radius: 16px;
+            border: none;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
         .btn-primary {
             background: var(--primary);
             color: white;
@@ -885,11 +895,14 @@
                 </div>
 
                 <div id="btn-group-confirm" class="btn-row" style="display:none;">
-                    <button class="btn-half btn-outline" onclick="changePhoto()">
-                        <i class="ph-bold ph-images"></i> 사진 변경
+                    <button class="btn-third btn-outline" onclick="retakePhoto()">
+                        <i class="ph-bold ph-camera"></i> 재촬영
                     </button>
-                    <button class="btn-half btn-dark" onclick="runAi()">
-                        <i class="ph-bold ph-lightning"></i> AI 분석 실행
+                    <button class="btn-third btn-outline" onclick="changePhoto()">
+                        <i class="ph-bold ph-images"></i> 갤러리
+                    </button>
+                    <button class="btn-third btn-dark" onclick="runAi()">
+                        <i class="ph-bold ph-lightning"></i> AI 분석
                     </button>
                 </div>
 
@@ -1542,28 +1555,60 @@
         async function connectBle() {
             try {
                 console.log('=== connectBle 함수 호출됨 ===');
-                console.log('CONFIG.API_BASE_URL:', CONFIG.API_BASE_URL);
                 showToast('BLE 디바이스 연결 중...', 'info');
 
-                const apiUrl = `${CONFIG.API_BASE_URL}/api/v1/ble/connect`;
-                console.log('BLE API 호출 URL:', apiUrl);
+                // 모바일 앱인지 웹인지 확인
+                const isMobileApp = typeof cordova !== 'undefined' && cordovaBLE;
 
-                // 백엔드 API로 BLE 연결 요청
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({})  // 자동으로 MySkin_LED_Mask 검색
-                });
+                if (isMobileApp) {
+                    // 모바일: Cordova BLE 플러그인 직접 사용
+                    console.log('모바일 앱: Cordova BLE 직접 연결');
 
-                const data = await response.json();
+                    // BLE 디바이스 스캔
+                    const devices = await cordovaBLE.scan(10);
 
-                if (data.success) {
+                    if (devices.length === 0) {
+                        throw new Error('BLE 디바이스를 찾을 수 없습니다. LED 마스크의 전원을 확인해주세요.');
+                    }
+
+                    // 첫 번째 발견된 디바이스에 연결
+                    const device = devices[0];
+                    await cordovaBLE.connect(device.id);
+
                     state.connected = true;
-                    state.bleDeviceName = 'MySkin_LED_Mask';
+                    state.bleDeviceName = device.name || 'MySkin_LED_Mask';
                     updateBleStatus(true, state.bleDeviceName);
                     showToast('BLE 디바이스 연결 성공!', 'success');
                 } else {
-                    throw new Error(data.message || '연결 실패');
+                    // 웹: 백엔드 API 사용 (기존 방식)
+                    console.log('웹 버전: 백엔드 API 연결');
+                    console.log('CONFIG.API_BASE_URL:', CONFIG.API_BASE_URL);
+
+                    const apiUrl = `${CONFIG.API_BASE_URL}/api/v1/ble/connect`;
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({})
+                    });
+
+                    const data = await response.json();
+
+                    if (data.success) {
+                        // Mock/SERIAL 모드 체크
+                        if (data.mode === 'mock' || data.is_mock || data.mode === 'SERIAL' || data.is_serial) {
+                            showToast('실제 디바이스가 연결되어 있지 않습니다.', 'warning');
+                            state.connected = false;
+                            updateBleStatus(false);
+                            return;
+                        }
+
+                        state.connected = true;
+                        state.bleDeviceName = data.device_name || 'MySkin_LED_Mask';
+                        updateBleStatus(true, state.bleDeviceName);
+                        showToast('BLE 디바이스 연결 성공!', 'success');
+                    } else {
+                        throw new Error(data.message || '연결 실패');
+                    }
                 }
             } catch (error) {
                 console.error('BLE 연결 오류:', error);
@@ -1578,13 +1623,23 @@
                 // 연결 해제 시 모든 동작 정지
                 stopTherapy(false);
 
-                // 백엔드 API로 연결 해제 요청
-                const response = await fetch(`${CONFIG.API_BASE_URL}/api/v1/ble/disconnect`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
-                });
+                // 모바일 앱인지 웹인지 확인
+                const isMobileApp = typeof cordova !== 'undefined' && cordovaBLE;
 
-                const data = await response.json();
+                if (isMobileApp) {
+                    // 모바일: Cordova BLE 직접 연결 해제
+                    console.log('모바일 앱: Cordova BLE 직접 연결 해제');
+                    await cordovaBLE.disconnect();
+                } else {
+                    // 웹: 백엔드 API로 연결 해제 요청
+                    console.log('웹 버전: 백엔드 API 연결 해제');
+                    const response = await fetch(`${CONFIG.API_BASE_URL}/api/v1/ble/disconnect`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' }
+                    });
+
+                    const data = await response.json();
+                }
 
                 state.connected = false;
                 state.bleDeviceName = '';
@@ -1607,35 +1662,61 @@
                 // 명령어 파싱 (예: "START:RED:20")
                 const parts = command.split(':');
 
-                if (parts[0] === 'START' && parts.length === 3) {
-                    const mode = parts[1].toLowerCase();
-                    const duration = parseInt(parts[2]);
+                // 모바일 앱인지 웹인지 확인
+                const isMobileApp = typeof cordova !== 'undefined' && cordovaBLE;
 
-                    const response = await fetch(`${CONFIG.API_BASE_URL}/api/v1/ble/therapy/start`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ mode, duration })
-                    });
+                if (isMobileApp) {
+                    // 모바일: Cordova BLE 플러그인으로 직접 명령 전송
+                    console.log('모바일 앱: Cordova BLE 직접 명령 전송:', command);
 
-                    const data = await response.json();
-                    if (!data.success) {
-                        throw new Error(data.message || '명령 전송 실패');
+                    if (parts[0] === 'START' && parts.length === 3) {
+                        const mode = parts[1].toUpperCase();
+                        const duration = parseInt(parts[2]);
+
+                        await cordovaBLE.sendLEDCommand(mode, duration);
+                        console.log("LED 테라피 시작:", mode, duration);
+
+                    } else if (parts[0] === 'STOP') {
+                        // STOP 명령은 단순히 문자열로 전송
+                        await cordovaBLE.sendLEDCommand('STOP', 0);
+                        console.log("LED 테라피 중지");
+                    } else {
+                        console.log("알 수 없는 명령:", command);
                     }
-                    console.log("LED 테라피 시작:", data);
-
-                } else if (parts[0] === 'STOP') {
-                    const response = await fetch(`${CONFIG.API_BASE_URL}/api/v1/ble/therapy/stop`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' }
-                    });
-
-                    const data = await response.json();
-                    if (!data.success) {
-                        throw new Error(data.message || '중지 실패');
-                    }
-                    console.log("LED 테라피 중지:", data);
                 } else {
-                    console.log("알 수 없는 명령:", command);
+                    // 웹: 백엔드 API 사용
+                    console.log('웹 버전: 백엔드 API 명령 전송:', command);
+
+                    if (parts[0] === 'START' && parts.length === 3) {
+                        const mode = parts[1].toLowerCase();
+                        const duration = parseInt(parts[2]);
+
+                        const response = await fetch(`${CONFIG.API_BASE_URL}/api/v1/ble/therapy/start`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ mode, duration })
+                        });
+
+                        const data = await response.json();
+                        if (!data.success) {
+                            throw new Error(data.message || '명령 전송 실패');
+                        }
+                        console.log("LED 테라피 시작:", data);
+
+                    } else if (parts[0] === 'STOP') {
+                        const response = await fetch(`${CONFIG.API_BASE_URL}/api/v1/ble/therapy/stop`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' }
+                        });
+
+                        const data = await response.json();
+                        if (!data.success) {
+                            throw new Error(data.message || '중지 실패');
+                        }
+                        console.log("LED 테라피 중지:", data);
+                    } else {
+                        console.log("알 수 없는 명령:", command);
+                    }
                 }
 
             } catch (error) {
@@ -1742,28 +1823,81 @@
 
         async function startCamera() {
             try {
-                if (state.cameraStream) state.cameraStream.getTracks().forEach(t => t.stop());
-                const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 1280 } }, audio: false });
+                console.log('=== startCamera 호출됨 ===');
 
-                const frame = document.querySelector('.camera-frame');
-                let video = document.getElementById('cameraVideo');
-                if (video) video.remove();
+                // Cordova 환경 확인
+                if (typeof cordovaCamera !== 'undefined' && cordovaCamera) {
+                    console.log('Cordova 카메라 사용');
+                    showToast('카메라를 시작합니다...', 'info');
 
-                video = document.createElement('video'); video.id = 'cameraVideo';
-                video.setAttribute('autoplay', ''); video.setAttribute('playsinline', ''); video.setAttribute('muted', '');
-                video.srcObject = stream;
-                video.style.cssText = 'width:100%; height:100%; object-fit:cover; transform:scaleX(-1);';
-                video.onloadedmetadata = () => { video.play().catch(e => console.log(e)); };
+                    // 네이티브 카메라로 사진 촬영
+                    const imageDataURL = await cordovaCamera.takePicture();
+                    console.log('사진 촬영 완료, imageDataURL 길이:', imageDataURL.length);
 
-                document.getElementById('preview-img').style.display = 'none';
-                document.getElementById('cam-guide').style.display = 'none';
-                document.getElementById('face-guide-overlay').style.display = 'flex';
-                frame.prepend(video); state.cameraStream = stream;
+                    // Base64를 Blob으로 변환 (에러 처리 포함)
+                    try {
+                        const blob = cordovaCamera.dataURLtoBlob(imageDataURL);
+                        state.capturedImage = blob;
+                        console.log('Blob 변환 성공, 크기:', blob.size);
+                    } catch (error) {
+                        console.error('Blob 변환 실패:', error);
+                        console.log('imageDataURL 시작 부분:', imageDataURL.substring(0, 100));
 
-                document.getElementById('btn-group-init').style.display = 'none';
-                document.getElementById('btn-group-capture').style.display = 'block';
-                document.getElementById('btn-group-confirm').style.display = 'none';
-            } catch (error) { showToast('카메라 권한 오류', 'error'); }
+                        // 대체 방법: 직접 Base64 디코딩
+                        try {
+                            const base64Data = imageDataURL.split(',')[1];
+                            const byteCharacters = atob(base64Data);
+                            const byteNumbers = new Array(byteCharacters.length);
+                            for (let i = 0; i < byteCharacters.length; i++) {
+                                byteNumbers[i] = byteCharacters.charCodeAt(i);
+                            }
+                            const byteArray = new Uint8Array(byteNumbers);
+                            state.capturedImage = new Blob([byteArray], { type: 'image/jpeg' });
+                            console.log('대체 방법으로 Blob 변환 성공, 크기:', state.capturedImage.size);
+                        } catch (altError) {
+                            console.error('대체 방법도 실패:', altError);
+                            showToast('이미지 변환 실패', 'error');
+                            return;
+                        }
+                    }
+
+                    // 미리보기 표시
+                    document.getElementById('preview-img').src = imageDataURL;
+                    document.getElementById('preview-img').style.display = 'block';
+                    document.getElementById('cam-guide').style.display = 'none';
+                    document.getElementById('btn-group-init').style.display = 'none';
+                    document.getElementById('btn-group-capture').style.display = 'none';
+                    document.getElementById('btn-group-confirm').style.display = 'flex';
+
+                } else {
+                    console.log('웹 브라우저 카메라 사용 (폴백)');
+                    // 웹 브라우저 환경 - 기존 코드 사용
+                    if (state.cameraStream) state.cameraStream.getTracks().forEach(t => t.stop());
+                    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user', width: { ideal: 1280 } }, audio: false });
+
+                    const frame = document.querySelector('.camera-frame');
+                    let video = document.getElementById('cameraVideo');
+                    if (video) video.remove();
+
+                    video = document.createElement('video'); video.id = 'cameraVideo';
+                    video.setAttribute('autoplay', ''); video.setAttribute('playsinline', ''); video.setAttribute('muted', '');
+                    video.srcObject = stream;
+                    video.style.cssText = 'width:100%; height:100%; object-fit:cover; transform:scaleX(-1);';
+                    video.onloadedmetadata = () => { video.play().catch(e => console.log(e)); };
+
+                    document.getElementById('preview-img').style.display = 'none';
+                    document.getElementById('cam-guide').style.display = 'none';
+                    document.getElementById('face-guide-overlay').style.display = 'flex';
+                    frame.prepend(video); state.cameraStream = stream;
+
+                    document.getElementById('btn-group-init').style.display = 'none';
+                    document.getElementById('btn-group-capture').style.display = 'block';
+                    document.getElementById('btn-group-confirm').style.display = 'none';
+                }
+            } catch (error) {
+                console.error('카메라 오류:', error);
+                showToast('카메라 오류: ' + error.message, 'error');
+            }
         }
 
         async function captureCamera() {
@@ -1796,6 +1930,15 @@
             document.getElementById('btn-group-capture').style.display = 'none';
             document.getElementById('btn-group-confirm').style.display = 'none';
             state.capturedImage = null;
+        }
+
+        // 재촬영 함수 (카메라로 다시 촬영)
+        function retakePhoto() {
+            console.log('=== retakePhoto 호출됨 ===');
+            // 현재 상태 초기화
+            resetCamera();
+            // 카메라 바로 시작
+            startCamera();
         }
 
         // ============================================

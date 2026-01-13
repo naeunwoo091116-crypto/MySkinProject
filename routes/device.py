@@ -16,9 +16,9 @@ try:
     from services.serial_service import get_serial_service
     device_service = get_serial_service()
     CONNECTION_MODE = "SERIAL"
-    print("✅ USB 시리얼 모드 사용 (유선 연결)")
+    print("[INFO] USB serial mode enabled (wired connection)")
 except Exception as e:
-    print(f"⚠️ 시리얼 연결 불가: {e}")
+    print(f"[WARNING] Serial connection unavailable: {e}")
 
 # 2. 시리얼 실패 시 BLE 시도
 if CONNECTION_MODE is None:
@@ -26,9 +26,9 @@ if CONNECTION_MODE is None:
         from services.ble_service import get_ble_service
         device_service = get_ble_service
         CONNECTION_MODE = "BLE"
-        print("✅ BLE 무선 모드 사용")
+        print("[INFO] BLE wireless mode enabled")
     except Exception as e:
-        print(f"⚠️ BLE 연결 불가: {e}")
+        print(f"[WARNING] BLE connection unavailable: {e}")
 
 # 3. 모두 실패 시 Mock 모드
 if CONNECTION_MODE is None:
@@ -36,13 +36,13 @@ if CONNECTION_MODE is None:
         from services.ble_service_mock import get_ble_service_mock
         device_service = get_ble_service_mock
         CONNECTION_MODE = "MOCK"
-        print("⚠️ Mock 모드 활성화 - 시뮬레이션만 가능")
-        print("   (실제 하드웨어 연결을 위해 USB 케이블 또는 블루투스 필요)")
+        print("[WARNING] Mock mode activated - simulation only")
+        print("   (USB cable or Bluetooth required for real hardware connection)")
     except Exception as e:
-        print(f"❌ 치명적 오류: 모든 연결 모드 실패")
+        print(f"[CRITICAL ERROR] All connection modes failed")
         raise
 
-print(f"📡 현재 연결 모드: {CONNECTION_MODE}")
+print(f"[DEVICE] Current connection mode: {CONNECTION_MODE}")
 
 device_bp = Blueprint('device', __name__)
 
@@ -104,11 +104,25 @@ def connect_ble_device():
     data = request.get_json() or {}
     service = get_device_service()
 
+    # Mock 또는 SERIAL 모드인 경우 실제 LED 디바이스가 없으므로 연결 실패
+    if CONNECTION_MODE == "MOCK":
+        return jsonify({
+            "success": False,
+            "message": "실제 디바이스가 연결되어 있지 않습니다. USB 또는 BLE 디바이스를 연결해주세요.",
+            "mode": CONNECTION_MODE,
+            "is_mock": True
+        }), 400
+
+    # SERIAL 모드는 보통 휴대폰 USB 모뎀이므로 연결 거부
     if CONNECTION_MODE == "SERIAL":
-        port = data.get('port')
-        success = service.connect(port)
-        address = service.port_name if success else None
-    elif CONNECTION_MODE in ["BLE", "MOCK"]:
+        return jsonify({
+            "success": False,
+            "message": "LED 마스크가 연결되어 있지 않습니다. BLE 디바이스를 사용해주세요.",
+            "mode": CONNECTION_MODE,
+            "is_serial": True
+        }), 400
+
+    if CONNECTION_MODE == "BLE":
         address = data.get('address')
         success = asyncio.run(service.connect(address))
         address = getattr(service, 'device_address', None)
@@ -121,7 +135,8 @@ def connect_ble_device():
             "success": True,
             "message": f"디바이스 연결 성공 ({CONNECTION_MODE} 모드)",
             "address": address,
-            "mode": CONNECTION_MODE
+            "mode": CONNECTION_MODE,
+            "device_name": getattr(service, 'device_name', 'MySkin_LED_Mask')
         })
     else:
         return jsonify({

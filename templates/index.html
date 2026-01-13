@@ -711,13 +711,28 @@
             </div>
 
             <div style="margin-bottom: 20px;">
+                <label
+                    style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px; color: var(--text-main);">성별</label>
+                <div style="display: flex; gap: 10px;">
+                    <label
+                        style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; border: 1px solid #E5E7EB; border-radius: 12px; cursor: pointer;">
+                        <input type="radio" name="gender" value="female" style="accent-color: var(--primary);"> 여성
+                    </label>
+                    <label
+                        style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px; border: 1px solid #E5E7EB; border-radius: 12px; cursor: pointer;">
+                        <input type="radio" name="gender" value="male" style="accent-color: var(--primary);"> 남성
+                    </label>
+                </div>
+            </div>
+
+            <div class="input-group">
                 <label style="display: block; font-size: 13px; font-weight: 600; color: #666; margin-bottom: 8px;">피부
                     타입</label>
                 <select id="profile-skin-type"
                     style="width: 100%; padding: 12px 16px; border: 2px solid #E5E7EB; border-radius: 12px; font-size: 14px; outline: none; background: white;">
-                    <option value="">선택해주세요</option>
-                    <option value="건성">건성</option>
                     <option value="지성">지성</option>
+                    <option value="건성">건성</option>
+                    <option value="중성">중성</option>
                     <option value="복합성">복합성</option>
                     <option value="민감성">민감성</option>
                 </select>
@@ -727,25 +742,25 @@
                 <label style="display: block; font-size: 13px; font-weight: 600; color: #666; margin-bottom: 8px;">피부 고민
                     (여러 개 선택 가능)</label>
                 <div style="display: flex; flex-wrap: wrap; gap: 8px;">
-                    <label
+                    <label class="concern-chip" data-concern="주름"
                         style="display: inline-flex; align-items: center; padding: 8px 12px; background: #F3F4F6; border-radius: 8px; cursor: pointer; font-size: 13px;">
-                        <input type="checkbox" value="주름" style="margin-right: 6px;"> 주름
+                        <input type="checkbox" value="주름" style="margin-right: 6px; display: none;"> 주름
                     </label>
-                    <label
+                    <label class="concern-chip" data-concern="색소침착"
                         style="display: inline-flex; align-items: center; padding: 8px 12px; background: #F3F4F6; border-radius: 8px; cursor: pointer; font-size: 13px;">
-                        <input type="checkbox" value="색소침착" style="margin-right: 6px;"> 색소침착
+                        <input type="checkbox" value="색소침착" style="margin-right: 6px; display: none;"> 색소침착
                     </label>
-                    <label
+                    <label class="concern-chip" data-concern="모공"
                         style="display: inline-flex; align-items: center; padding: 8px 12px; background: #F3F4F6; border-radius: 8px; cursor: pointer; font-size: 13px;">
-                        <input type="checkbox" value="모공" style="margin-right: 6px;"> 모공
+                        <input type="checkbox" value="모공" style="margin-right: 6px; display: none;"> 모공
                     </label>
-                    <label
+                    <label class="concern-chip" data-concern="탄력"
                         style="display: inline-flex; align-items: center; padding: 8px 12px; background: #F3F4F6; border-radius: 8px; cursor: pointer; font-size: 13px;">
-                        <input type="checkbox" value="탄력" style="margin-right: 6px;"> 탄력
+                        <input type="checkbox" value="탄력" style="margin-right: 6px; display: none;"> 탄력
                     </label>
-                    <label
+                    <label class="concern-chip" data-concern="여드름"
                         style="display: inline-flex; align-items: center; padding: 8px 12px; background: #F3F4F6; border-radius: 8px; cursor: pointer; font-size: 13px;">
-                        <input type="checkbox" value="여드름" style="margin-right: 6px;"> 여드름
+                        <input type="checkbox" value="여드름" style="margin-right: 6px; display: none;"> 여드름
                     </label>
                 </div>
             </div>
@@ -1050,6 +1065,62 @@
             <div id="history-list"></div>
         </div>
 
+        <div id="tab-chatbot" class="tab-content">
+            <div class="section-title">
+                <i class="ph-fill ph-plant" style="color:var(--primary);"></i> AI 피부 상담
+            </div>
+
+            <div id="chat-container" style="display:flex; flex-direction:column; height: calc(100vh - 180px);">
+                <div id="chat-box" style="flex:1; overflow-y:auto; padding-bottom:20px;">
+                    <!-- Welcome Message -->
+                    <div style="display:flex; align-items:flex-start; margin-bottom:16px;">
+                        <div
+                            style="width:32px; height:32px; background:white; border-radius:50%; display:flex; align-items:center; justify-content:center; border:1px solid #E5E7EB; margin-right:8px; flex-shrink:0;">
+                            <i class="ph-fill ph-plant" style="color:var(--primary); font-size:18px;"></i>
+                        </div>
+                        <div
+                            style="background:white; padding:12px 16px; border-radius:16px; border-bottom-left-radius:4px; max-width:85%; border:1px solid #E5E7EB; color:var(--text-main); font-size:15px; line-height:1.5;">
+                            안녕하세요! 피부 고민에 대해 무엇이든 물어보세요.<br><br>
+                            📷 사진을 함께 보내주시면 더 정확한 상담이 가능합니다.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Image Preview Area -->
+                <div id="chat-image-preview-container"
+                    style="display:none; padding: 10px; background: #f9fafb; border-top: 1px solid #e5e7eb; align-items: center; gap: 10px;">
+                    <img id="chat-preview-img" style="height: 50px; border-radius: 8px; border: 1px solid #ddd;">
+                    <span style="font-size: 12px; color: #666; flex: 1;">사진 첨부됨</span>
+                    <button onclick="cancelImageUpload()"
+                        style="background: none; border: none; padding: 4px; cursor: pointer; color: #ef4444;">
+                        <i class="ph-bold ph-x-circle" style="font-size: 20px;"></i>
+                    </button>
+                </div>
+
+                <!-- Input Area -->
+                <div style="padding:10px 0; background:var(--bg-page);">
+                    <div
+                        style="display:flex; gap:8px; align-items:center; background:white; padding:8px; border-radius:24px; border:1px solid #E5E7EB; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                        <label for="chat-image-input"
+                            style="padding:8px; cursor:pointer; color:#9CA3AF; display:flex; align-items:center;">
+                            <i class="ph-bold ph-image" style="font-size:24px;"></i>
+                        </label>
+                        <input type="file" id="chat-image-input" accept="image/*" style="display:none;"
+                            onchange="handleImageUpload(this)">
+
+                        <input type="text" id="chat-input" placeholder="메시지를 입력하세요..."
+                            style="flex:1; border:none; outline:none; font-size:15px; background:transparent;"
+                            onkeypress="if(event.key === 'Enter') sendChatMessage()">
+
+                        <button onclick="sendChatMessage()"
+                            style="width:36px; height:36px; border-radius:50%; background:var(--primary); border:none; color:white; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.3);">
+                            <i class="ph-bold ph-paper-plane-right" style="font-size:18px;"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <nav class="nav-bar">
             <button class="nav-item active" onclick="switchTab('home')"><i class="ph-fill ph-house"></i> 홈</button>
             <button class="nav-item" onclick="switchTab('analysis')"><i class="ph-bold ph-scan"></i> 분석</button>
@@ -1057,6 +1128,8 @@
                 디바이스</button>
             <button class="nav-item" onclick="switchTab('history')"><i class="ph-bold ph-clock-counter-clockwise"></i>
                 기록</button>
+            <button class="nav-item" onclick="switchTab('chatbot')"><i class="ph-bold ph-chat-circle-dots"></i>
+                상담</button>
         </nav>
     </div>
 
@@ -1192,25 +1265,24 @@
         async function loadProfileToModal() {
             try {
                 const response = await fetch(`${CONFIG.API_BASE_URL}/api/v1/user/profile/${CONFIG.USER_ID}`);
+                const data = await response.json();
+                if (data.success) {
+                    const p = data.profile;
+                    document.getElementById('profile-name').value = p.name || '';
+                    document.getElementById('profile-skin-type').value = p.skin_type || '지성';
+                    document.getElementById('profile-goals').value = p.goals || '';
 
-                if (response.ok) {
-                    const data = await response.json();
-                    const profile = data.profile;
-
-                    if (profile) {
-                        document.getElementById('profile-name').value = profile.name || '';
-                        document.getElementById('profile-skin-type').value = profile.skin_type || '';
-                        document.getElementById('profile-goals').value = profile.goals || '';
-
-                        // 체크박스 설정
-                        const concerns = profile.concerns || [];
-                        document.querySelectorAll('#profile-modal input[type="checkbox"]').forEach(cb => {
-                            cb.checked = concerns.includes(cb.value);
-                        });
+                    if (p.gender) {
+                        const genderRadio = document.querySelector(`input[name="gender"][value="${p.gender}"]`);
+                        if (genderRadio) genderRadio.checked = true;
                     }
+
+                    document.querySelectorAll('.concern-chip').forEach(chip => {
+                        chip.classList.toggle('active', p.concerns?.includes(chip.dataset.concern));
+                    });
                 }
-            } catch (error) {
-                console.log('프로필 로드 실패:', error);
+            } catch (err) {
+                console.error('Failed to fetch profile:', err);
             }
         }
 
@@ -1357,19 +1429,17 @@
                 return;
             }
 
-            // 선택된 피부 고민 수집
-            const concerns = Array.from(document.querySelectorAll('#profile-modal input[type="checkbox"]:checked'))
-                .map(cb => cb.value);
-
-            const profileData = {
-                user_id: CONFIG.USER_ID,
-                name: name,
-                skin_type: document.getElementById('profile-skin-type').value,
-                concerns: concerns,
-                goals: document.getElementById('profile-goals').value.trim()
-            };
-
             try {
+                const checkedGender = document.querySelector('input[name="gender"]:checked');
+                const profileData = {
+                    user_id: CONFIG.USER_ID,
+                    name: document.getElementById('profile-name').value,
+                    gender: checkedGender ? checkedGender.value : null,
+                    skin_type: document.getElementById('profile-skin-type').value,
+                    concerns: Array.from(document.querySelectorAll('.concern-chip.active')).map(el => el.dataset.concern),
+                    goals: document.getElementById('profile-goals').value
+                };
+
                 const response = await fetch(`${CONFIG.API_BASE_URL}/api/v1/user/profile`, {
                     method: 'POST',
                     headers: {
@@ -1446,10 +1516,210 @@
             if (navItems[tabs.indexOf(tabId)]) navItems[tabs.indexOf(tabId)].classList.add('active');
 
             if (tabId === 'history') renderHistory();
+            if (tabId === 'chatbot') {
+                loadChatHistory();
+                setTimeout(() => {
+                    const chatBox = document.getElementById('chat-box');
+                    chatBox.scrollTop = chatBox.scrollHeight;
+                }, 100);
+            }
             window.scrollTo(0, 0);
         }
 
         // ============================================
+        // 4. Chatbot Logic
+        // ============================================
+        async function loadChatHistory() {
+            try {
+                const response = await fetch(`/api/v1/chatbot/history/${CONFIG.USER_ID}`);
+                const history = await response.json();
+
+                const chatBox = document.getElementById('chat-box');
+                // Preserve welcome message if box is empty or just has welcome
+                const welcomeMsg = chatBox.firstElementChild;
+                chatBox.innerHTML = '';
+                if (welcomeMsg) chatBox.appendChild(welcomeMsg);
+
+                history.forEach(chat => {
+                    renderMessage(chat.message, 'user', chat.image_path);
+                    renderMessage(chat.reply, 'bot');
+                });
+            } catch (err) {
+                console.error('Failed to load chat history:', err);
+            }
+        }
+
+        async function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            const imageInput = document.getElementById('chat-image-input');
+            const imageFile = imageInput.files[0];
+
+            if (!message && !imageFile) return;
+
+            // Clear inputs
+            input.value = '';
+            document.getElementById('chat-image-preview-container').style.display = 'none';
+            imageInput.value = ''; // Reset file input
+
+            // Show user message
+            let imageSrc = null;
+            if (imageFile) {
+                imageSrc = URL.createObjectURL(imageFile);
+            }
+            renderMessage(message, 'user', imageSrc);
+
+            // Show loading
+            renderLoading(true);
+
+            try {
+                const formData = new FormData();
+                formData.append('user_id', CONFIG.USER_ID);
+                formData.append('message', message);
+                if (imageFile) {
+                    formData.append('image', imageFile);
+                }
+
+                // If user wants to attach current analysis photo (logic to be implemented if needed)
+                // For now, we rely on manual upload.
+
+                const response = await fetch('/api/v1/chatbot/chat', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                // Remove loading
+                renderLoading(false);
+
+                if (data.reply) {
+                    renderMessage(data.reply, 'bot');
+                } else if (data.error) {
+                    renderMessage('오류가 발생했습니다: ' + data.error, 'bot');
+                }
+
+            } catch (error) {
+                console.error('Chat error:', error);
+                renderLoading(false);
+                renderMessage('서버 통신 중 오류가 발생했습니다.', 'bot');
+            }
+        }
+
+        function renderMessage(text, sender, imageUrl = null) {
+            const chatBox = document.getElementById('chat-box');
+
+            const msgDiv = document.createElement('div');
+            msgDiv.style.display = 'flex';
+            msgDiv.style.flexDirection = 'column';
+            msgDiv.style.alignItems = sender === 'user' ? 'flex-end' : 'flex-start';
+            msgDiv.style.marginBottom = '16px';
+            msgDiv.style.opacity = '0';
+            msgDiv.style.animation = 'fadeUp 0.3s forwards';
+
+            // Image display
+            if (imageUrl) {
+                const img = document.createElement('img');
+                img.src = imageUrl;
+                img.style.maxWidth = '200px';
+                img.style.borderRadius = '12px';
+                img.style.marginBottom = '8px';
+                img.style.border = '1px solid #E5E7EB';
+                msgDiv.appendChild(img);
+            }
+
+            // Text bubble
+            if (text) {
+                const bubble = document.createElement('div');
+                bubble.style.padding = '12px 16px';
+                bubble.style.borderRadius = '16px';
+                bubble.style.maxWidth = '85%';
+                bubble.style.fontSize = '15px';
+                bubble.style.lineHeight = '1.5';
+
+                if (sender === 'user') {
+                    bubble.style.background = 'var(--primary)';
+                    bubble.style.color = 'white';
+                    bubble.style.borderBottomRightRadius = '4px';
+                } else {
+                    bubble.style.background = 'white';
+                    bubble.style.color = 'var(--text-main)';
+                    bubble.style.border = '1px solid #E5E7EB';
+                    bubble.style.borderBottomLeftRadius = '4px';
+                    bubble.style.whiteSpace = 'pre-wrap'; // Preserve newlines
+                }
+
+                bubble.innerText = text;
+                msgDiv.appendChild(bubble);
+            }
+
+            chatBox.appendChild(msgDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function renderLoading(isLoading) {
+            const chatBox = document.getElementById('chat-box');
+            const existingLoader = document.getElementById('chat-loader');
+
+            if (isLoading) {
+                if (existingLoader) return;
+
+                const loaderDiv = document.createElement('div');
+                loaderDiv.id = 'chat-loader';
+                loaderDiv.style.display = 'flex';
+                loaderDiv.style.alignItems = 'center';
+                loaderDiv.style.gap = '8px';
+                loaderDiv.style.marginBottom = '16px';
+                loaderDiv.style.color = '#6B7280';
+                loaderDiv.style.fontSize = '12px';
+
+                loaderDiv.innerHTML = `
+                    <div style="width:24px; height:24px; background:white; border-radius:50%; display:flex; align-items:center; justify-content:center; border:1px solid #E5E7EB;">
+                        <i class="ph-fill ph-plant" style="color:var(--primary);"></i>
+                    </div>
+                    <div class="typing-indicator" style="background:#F3F4F6; padding:8px 12px; border-radius:12px; display:flex; gap:4px;">
+                        <span style="width:4px; height:4px; background:#9CA3AF; border-radius:50%; animation: bounce 1s infinite;"></span>
+                        <span style="width:4px; height:4px; background:#9CA3AF; border-radius:50%; animation: bounce 1s infinite 0.2s;"></span>
+                        <span style="width:4px; height:4px; background:#9CA3AF; border-radius:50%; animation: bounce 1s infinite 0.4s;"></span>
+                    </div>
+                    <span>AI가 답변을 생성중입니다...</span>
+                `;
+
+                chatBox.appendChild(loaderDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;
+            } else {
+                if (existingLoader) existingLoader.remove();
+            }
+        }
+
+        function handleImageUpload(input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    const previewContainer = document.getElementById('chat-image-preview-container');
+                    const previewImg = document.getElementById('chat-preview-img');
+                    previewImg.src = e.target.result;
+                    previewContainer.style.display = 'flex';
+                }
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function cancelImageUpload() {
+            document.getElementById('chat-image-input').value = '';
+            document.getElementById('chat-image-preview-container').style.display = 'none';
+        }
+
+        // Add bounce animation style
+        const styleSheet = document.createElement("style");
+        styleSheet.innerText = `
+            @keyframes bounce {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-4px); }
+            }
+        `;
+        document.head.appendChild(styleSheet);
         // 3. BLE Logic (Backend API 사용)
         // ============================================
         async function checkBleStatus() {

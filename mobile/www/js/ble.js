@@ -119,8 +119,13 @@ class CordovaBLE {
                 return;
             }
 
-            // 명령 형식: START:{MODE}:{DURATION}
-            const command = `START:${mode.toUpperCase()}:${duration}`;
+            // 명령 형식: START:{MODE}:{DURATION} 또는 STOP
+            let command;
+            if (mode === 'STOP') {
+                command = 'STOP';
+            } else {
+                command = `START:${mode.toUpperCase()}:${duration}`;
+            }
             console.log('📤 명령 전송:', command);
 
             // 문자열을 ArrayBuffer로 변환

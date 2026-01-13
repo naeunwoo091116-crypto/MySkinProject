@@ -2,9 +2,10 @@
 분석 히스토리 관리 서비스
 """
 from datetime import datetime
-from models.database import AnalysisHistory, User, SessionLocal
+from models.database import AnalysisHistory, User, ChatHistory, SessionLocal
 from core.constants import MAX_HISTORY_ITEMS
 from core.logger import setup_logger
+from werkzeug.security import generate_password_hash, check_password_hash
 
 logger = setup_logger(__name__)
 
@@ -202,8 +203,15 @@ class ProfileService:
                 # 업데이트
                 existing_user.name = profile_data.get('name', existing_user.name)
                 existing_user.skin_type = profile_data.get('skin_type', existing_user.skin_type)
+                existing_user.gender = profile_data.get('gender', existing_user.gender)
                 existing_user.concerns = profile_data.get('concerns', existing_user.concerns)
                 existing_user.goals = profile_data.get('goals', existing_user.goals)
+                
+                # 비밀번호가 제공된 경우에만 업데이트
+                password = profile_data.get('password')
+                if password:
+                    existing_user.password_hash = generate_password_hash(password)
+                
                 existing_user.updated_at = datetime.now()
 
                 db.commit()
@@ -221,10 +229,12 @@ class ProfileService:
                     user_id=user_id,
                     name=profile_data.get('name'),
                     skin_type=profile_data.get('skin_type'),
+                    gender=profile_data.get('gender'),
                     concerns=profile_data.get('concerns', []),
-                    goals=profile_data.get('goals', '')
+                    goals=profile_data.get('goals', ''),
+                    password_hash=generate_password_hash(profile_data.get('password', '1234')) # 기본값 1234
                 )
-
+ 
                 db.add(new_user)
                 db.commit()
                 db.refresh(new_user)
@@ -279,6 +289,33 @@ class ProfileService:
             db.close()
 
     @staticmethod
+    def verify_login(user_id, password):
+        """
+        사용자 로그인 검증
+        """
+        db = SessionLocal()
+        try:
+            user = db.query(User).filter(User.user_id == user_id).first()
+            if user and user.password_hash:
+                if check_password_hash(user.password_hash, password):
+                    user.last_login_at = datetime.now()
+                    db.commit()
+                    return {"success": True, "profile": user.to_dict()}
+            
+            # 초기 버전 호환성: 비밀번호가 없는 경우 user_id만으로 로그인 허용 (선택 사항)
+            if user and not user.password_hash:
+                 user.last_login_at = datetime.now()
+                 db.commit()
+                 return {"success": True, "profile": user.to_dict()}
+
+            return {"success": False, "error": "아이디 또는 비밀번호가 일치하지 않습니다."}
+        except Exception as e:
+            logger.error(f"❌ 로그인 검증 오류: {e}")
+            return {"success": False, "error": str(e)}
+        finally:
+            db.close()
+
+    @staticmethod
     def get_all_users():
         """
         모든 사용자 목록 조회
@@ -295,6 +332,36 @@ class ProfileService:
             ]
         except Exception as e:
             logger.error(f"❌ 사용자 목록 조회 오류: {e}")
+            raise
+        finally:
+            db.close()
+
+    @staticmethod
+    def delete_user(user_id):
+        """
+        사용자 및 관련 데이터 삭제
+        """
+        db = SessionLocal()
+        try:
+            # 사용자 조회
+            user = db.query(User).filter(User.user_id == user_id).first()
+            if not user:
+                return {"success": False, "error": "사용자를 찾을 수 없습니다."}
+
+            # 연관 데이터 삭제 (AnalysisHistory, ChatHistory)
+            db.query(AnalysisHistory).filter(AnalysisHistory.user_id == user_id).delete()
+            db.query(ChatHistory).filter(ChatHistory.user_id == user_id).delete()
+
+            # 사용자 삭제
+            db.delete(user)
+            db.commit()
+            
+            logger.info(f"🗑️ 사용자 삭제 완료: {user_id}")
+            return {"success": True, "message": "사용자가 삭제되었습니다."}
+            
+        except Exception as e:
+            db.rollback()
+            logger.error(f"❌ 사용자 삭제 오류: {e}")
             raise
         finally:
             db.close()
