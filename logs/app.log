@@ -3898,3 +3898,17 @@ WHERE users.user_id = %(user_id_1)s
 
 2026-01-13 14:20:51 - services.history_service - INFO - 📝 히스토리 저장 완료: user_tpoqzoj6a - 점수 84.3
 2026-01-13 14:21:30 - services.history_service - INFO - 📝 새 프로필 생성 완료: user_tzf4p0ox6
+2026-01-13 14:46:20 - services.ai_service - INFO - --- AI 모델 로딩 시작 ---
+2026-01-13 14:46:20 - services.ai_service - INFO - 🔄 로딩 중: forehead (Class:4, Reg:15)
+2026-01-13 14:46:21 - services.ai_service - INFO - ✅ forehead 로드 성공!
+2026-01-13 14:46:21 - services.ai_service - INFO - 🔄 로딩 중: eye_l (Class:4, Reg:8)
+2026-01-13 14:46:21 - services.ai_service - INFO - ✅ eye_l 로드 성공!
+2026-01-13 14:46:21 - services.ai_service - INFO - 🔄 로딩 중: eye_r (Class:4, Reg:8)
+2026-01-13 14:46:21 - services.ai_service - INFO - ✅ eye_r 로드 성공!
+2026-01-13 14:46:21 - services.ai_service - INFO - 🔄 로딩 중: cheek_l (Class:4, Reg:16)
+2026-01-13 14:46:22 - services.ai_service - INFO - ✅ cheek_l 로드 성공!
+2026-01-13 14:46:22 - services.ai_service - INFO - 🔄 로딩 중: cheek_r (Class:4, Reg:16)
+2026-01-13 14:46:22 - services.ai_service - INFO - ✅ cheek_r 로드 성공!
+2026-01-13 14:46:22 - services.ai_service - INFO - 🔄 로딩 중: chin (Class:4, Reg:15)
+2026-01-13 14:46:22 - services.ai_service - INFO - ✅ chin 로드 성공!
+2026-01-13 14:46:22 - services.ai_service - INFO - 총 6개 모델 로드 완료
