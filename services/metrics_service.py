@@ -94,19 +94,32 @@ class MetricsService:
         AI 예측 결과 처리
 
         Args:
-            cls_out: 분류 출력
-            reg_out: 회귀 출력
+            cls_out: 분류 출력 (Tensor 또는 list)
+            reg_out: 회귀 출력 (Tensor 또는 list)
             region_name: 부위 이름
 
         Returns:
             dict: {grade, metrics, score}
         """
-        # 분류 결과
-        grade = torch.argmax(cls_out, dim=1).item()
-        confidence = torch.softmax(cls_out, dim=1).max().item()
+        # 분류 결과 (Tensor 또는 list 처리)
+        if isinstance(cls_out, list):
+            # 원격 GPU 서버에서 받은 list 데이터
+            cls_tensor = torch.tensor(cls_out)
+            grade = torch.argmax(cls_tensor, dim=1).item()
+            confidence = torch.softmax(cls_tensor, dim=1).max().item()
+        else:
+            # 로컬 Tensor 데이터
+            grade = torch.argmax(cls_out, dim=1).item()
+            confidence = torch.softmax(cls_out, dim=1).max().item()
 
-        # 회귀 결과
-        reg_values = reg_out.squeeze().cpu().numpy().tolist()
+        # 회귀 결과 (Tensor 또는 list 처리)
+        if isinstance(reg_out, list):
+            # 원격 GPU 서버에서 받은 list 데이터
+            reg_values = reg_out[0] if isinstance(reg_out[0], list) else reg_out
+        else:
+            # 로컬 Tensor 데이터
+            reg_values = reg_out.squeeze().cpu().numpy().tolist()
+
         metrics = MetricsService.parse_regression_values(region_name, reg_values)
 
         # 점수 계산
