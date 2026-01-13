@@ -1,15 +1,19 @@
 """
 애플리케이션 설정
 """
-import torch
 import os
 from dotenv import load_dotenv
 
 # 환경 변수 로드
 load_dotenv()
 
-# PyTorch 디바이스 설정
-DEVICE = torch.device('cpu')
+# PyTorch 디바이스 설정 (GPU 서버에서만 사용)
+try:
+    import torch
+    DEVICE = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+except ImportError:
+    # torch가 없는 환경 (Render 등)에서는 None으로 설정
+    DEVICE = None
 
 # 데이터베이스 설정
 DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://postgres:password@localhost/skin_analysis')

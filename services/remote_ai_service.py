@@ -6,7 +6,6 @@ import requests
 import io
 from PIL import Image
 from core.logger import setup_logger
-from core.config import METRIC_NAMES
 import os
 
 logger = setup_logger(__name__)
