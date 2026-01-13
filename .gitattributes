@@ -1,3 +1,6 @@
 *.safetensors filter=lfs diff=lfs merge=lfs -text
+<<<<<<< HEAD
 *.safetensors
 final/
+=======
+>>>>>>> c00d42fac8c7bee9f7baf421afc11a1d0425236e
