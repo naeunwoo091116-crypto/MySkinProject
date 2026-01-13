@@ -11,13 +11,39 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Database setup
+def get_database_url():
+    """Get appropriate database URL based on environment"""
+    # Check if running on Google App Engine
+    if os.getenv('GAE_ENV', '').startswith('standard') or os.getenv('GAE_ENV', '') == 'flex':
+        # App Engine environment - use Cloud SQL
+        db_user = os.getenv('DB_USER', 'postgres')
+        db_pass = os.getenv('DB_PASSWORD', 'myskin123')
+        db_name = os.getenv('DB_NAME', 'myskin')
+        cloud_sql_connection_name = os.getenv('CLOUD_SQL_CONNECTION_NAME')
+
+        if cloud_sql_connection_name:
+            # Unix socket connection for Cloud SQL
+            return f'postgresql+psycopg2://{db_user}:{db_pass}@/{db_name}?host=/cloudsql/{cloud_sql_connection_name}'
+        else:
+            print("WARNING: CLOUD_SQL_CONNECTION_NAME not set in App Engine environment")
+            return None
+    else:
+        # Local development environment
+        return os.getenv('DATABASE_URL', 'postgresql://postgres:myskin123@127.0.0.1:5432/myskin')
+
 try:
-    # Try PostgreSQL first
-    DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://postgres:myskin123@127.0.0.1:5432/myskin')
-    engine = create_engine(DATABASE_URL, echo=True)
-    # Force connection check
-    with engine.connect() as conn:
-        pass
+    # Try to get database URL
+    DATABASE_URL = get_database_url()
+
+    if DATABASE_URL:
+        engine = create_engine(DATABASE_URL, echo=True)
+        # Force connection check
+        with engine.connect() as conn:
+            pass
+        print(f"[INFO] Connected to database: {DATABASE_URL.split('@')[0]}@***")
+    else:
+        raise Exception("No database URL configured")
+
 except (ImportError, ModuleNotFoundError, Exception) as e:
     print(f"WARNING: Database connection failed (PostgreSQL): {e}")
     print("INFO: Falling back to SQLite...")

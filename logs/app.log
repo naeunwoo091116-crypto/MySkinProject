@@ -3915,3 +3915,72 @@ WHERE users.user_id = %(user_id_1)s
 2026-01-13 14:46:22 - services.ai_service - INFO - 총 6개 모델 로드 완료
 =======
 >>>>>>> e8fe56197ef68a5b05c9194d8f777be29427face
+2026-01-13 15:12:46 - services.ai_service - INFO - --- AI 모델 로딩 시작 ---
+2026-01-13 15:12:46 - services.ai_service - INFO - 🔄 로딩 중: forehead (Class:4, Reg:15)
+2026-01-13 15:12:46 - services.ai_service - INFO - ✅ forehead 로드 성공!
+2026-01-13 15:12:46 - services.ai_service - INFO - 🔄 로딩 중: eye_l (Class:4, Reg:8)
+2026-01-13 15:12:47 - services.ai_service - INFO - ✅ eye_l 로드 성공!
+2026-01-13 15:12:47 - services.ai_service - INFO - 🔄 로딩 중: eye_r (Class:4, Reg:8)
+2026-01-13 15:12:47 - services.ai_service - INFO - ✅ eye_r 로드 성공!
+2026-01-13 15:12:47 - services.ai_service - INFO - 🔄 로딩 중: cheek_l (Class:4, Reg:16)
+2026-01-13 15:12:47 - services.ai_service - INFO - ✅ cheek_l 로드 성공!
+2026-01-13 15:12:47 - services.ai_service - INFO - 🔄 로딩 중: cheek_r (Class:4, Reg:16)
+2026-01-13 15:12:48 - services.ai_service - INFO - ✅ cheek_r 로드 성공!
+2026-01-13 15:12:48 - services.ai_service - INFO - 🔄 로딩 중: chin (Class:4, Reg:15)
+2026-01-13 15:12:48 - services.ai_service - INFO - ✅ chin 로드 성공!
+2026-01-13 15:12:48 - services.ai_service - INFO - 총 6개 모델 로드 완료
+2026-01-13 15:13:37 - services.analysis_service - INFO - 
+==================================================
+2026-01-13 15:13:37 - services.analysis_service - INFO - 📸 [AI 분석 시작] 사용자: user_tzf4p0ox6 | 이미지: (720, 1044)
+2026-01-13 15:13:37 - services.analysis_service - INFO - ==================================================
+2026-01-13 15:13:37 - services.image_service - INFO - 
+   🔍 [이미지 검증 시작]
+2026-01-13 15:13:37 - services.image_service - INFO -    📏 이미지 크기: 720x1044
+2026-01-13 15:13:37 - services.image_service - INFO -    💡 평균 밝기: 146.9
+2026-01-13 15:13:37 - services.image_service - INFO - ✅ MediaPipe Face Detector 초기화 완료
+2026-01-13 15:13:37 - services.image_service - INFO -    🤖 얼굴 검출 실행 중 (MediaPipe)...
+2026-01-13 15:13:37 - services.image_service - INFO -    ✅ 1개의 얼굴 감지
+2026-01-13 15:13:37 - services.image_service - INFO -    📊 얼굴 #1 신뢰도: 98.44%
+2026-01-13 15:13:37 - services.image_service - INFO -    ✅ 이미지 검증 통과
+2026-01-13 15:13:37 - services.analysis_service - INFO - 
+   🤖 [AI 분석 시작]
+2026-01-13 15:13:37 - services.analysis_service - INFO -    ✅ forehead: Grade 0, Score 83.1
+2026-01-13 15:13:37 - services.analysis_service - INFO -    ✅ eye_l: Grade 0, Score 97.1
+2026-01-13 15:13:37 - services.analysis_service - INFO -    ✅ eye_r: Grade 0, Score 75.1
+2026-01-13 15:13:37 - services.analysis_service - INFO -    ✅ cheek_l: Grade 0, Score 78.9
+2026-01-13 15:13:38 - services.analysis_service - INFO -    ✅ cheek_r: Grade 0, Score 87.3
+2026-01-13 15:13:38 - services.analysis_service - INFO -    ✅ chin: Grade 0, Score 84.2
+2026-01-13 15:13:38 - services.analysis_service - INFO - 
+   📊 전체 점수: 84.3/100
+2026-01-13 15:13:38 - services.analysis_service - INFO -    💡 LED 추천: RED 모드 (15분)
+2026-01-13 15:13:38 - services.analysis_service - INFO - ==================================================
+
+2026-01-13 15:13:38 - services.history_service - INFO - 📝 히스토리 저장 완료: user_tzf4p0ox6 - 점수 84.3
+2026-01-13 15:43:09 - services.ai_service - INFO - --- AI 모델 로딩 시작 ---
+2026-01-13 15:43:09 - services.ai_service - INFO - 🔄 로딩 중: forehead (Class:4, Reg:15)
+2026-01-13 15:43:09 - services.ai_service - INFO - ✅ forehead 로드 성공!
+2026-01-13 15:43:09 - services.ai_service - INFO - 🔄 로딩 중: eye_l (Class:4, Reg:8)
+2026-01-13 15:43:09 - services.ai_service - INFO - ✅ eye_l 로드 성공!
+2026-01-13 15:43:09 - services.ai_service - INFO - 🔄 로딩 중: eye_r (Class:4, Reg:8)
+2026-01-13 15:43:10 - services.ai_service - INFO - ✅ eye_r 로드 성공!
+2026-01-13 15:43:10 - services.ai_service - INFO - 🔄 로딩 중: cheek_l (Class:4, Reg:16)
+2026-01-13 15:43:10 - services.ai_service - INFO - ✅ cheek_l 로드 성공!
+2026-01-13 15:43:10 - services.ai_service - INFO - 🔄 로딩 중: cheek_r (Class:4, Reg:16)
+2026-01-13 15:43:10 - services.ai_service - INFO - ✅ cheek_r 로드 성공!
+2026-01-13 15:43:10 - services.ai_service - INFO - 🔄 로딩 중: chin (Class:4, Reg:15)
+2026-01-13 15:43:10 - services.ai_service - INFO - ✅ chin 로드 성공!
+2026-01-13 15:43:10 - services.ai_service - INFO - 총 6개 모델 로드 완료
+2026-01-13 15:53:16 - services.ai_service - INFO - --- AI 모델 로딩 시작 ---
+2026-01-13 15:53:16 - services.ai_service - INFO - 🔄 로딩 중: forehead (Class:4, Reg:15)
+2026-01-13 15:53:16 - services.ai_service - INFO - ✅ forehead 로드 성공!
+2026-01-13 15:53:16 - services.ai_service - INFO - 🔄 로딩 중: eye_l (Class:4, Reg:8)
+2026-01-13 15:53:17 - services.ai_service - INFO - ✅ eye_l 로드 성공!
+2026-01-13 15:53:17 - services.ai_service - INFO - 🔄 로딩 중: eye_r (Class:4, Reg:8)
+2026-01-13 15:53:17 - services.ai_service - INFO - ✅ eye_r 로드 성공!
+2026-01-13 15:53:17 - services.ai_service - INFO - 🔄 로딩 중: cheek_l (Class:4, Reg:16)
+2026-01-13 15:53:17 - services.ai_service - INFO - ✅ cheek_l 로드 성공!
+2026-01-13 15:53:17 - services.ai_service - INFO - 🔄 로딩 중: cheek_r (Class:4, Reg:16)
+2026-01-13 15:53:18 - services.ai_service - INFO - ✅ cheek_r 로드 성공!
+2026-01-13 15:53:18 - services.ai_service - INFO - 🔄 로딩 중: chin (Class:4, Reg:15)
+2026-01-13 15:53:18 - services.ai_service - INFO - ✅ chin 로드 성공!
+2026-01-13 15:53:18 - services.ai_service - INFO - 총 6개 모델 로드 완료

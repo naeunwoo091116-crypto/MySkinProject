@@ -1657,6 +1657,8 @@
             chatBox.scrollTop = chatBox.scrollHeight;
         }
 
+        let loadingInterval = null;
+
         function renderLoading(isLoading) {
             const chatBox = document.getElementById('chat-box');
             const existingLoader = document.getElementById('chat-loader');
@@ -1673,6 +1675,9 @@
                 loaderDiv.style.color = '#6B7280';
                 loaderDiv.style.fontSize = '12px';
 
+                // Initial text
+                const initialText = "AI가 답변을 생성중입니다...";
+
                 loaderDiv.innerHTML = `
                     <div style="width:24px; height:24px; background:white; border-radius:50%; display:flex; align-items:center; justify-content:center; border:1px solid #E5E7EB;">
                         <i class="ph-fill ph-plant" style="color:var(--primary);"></i>
@@ -1682,12 +1687,37 @@
                         <span style="width:4px; height:4px; background:#9CA3AF; border-radius:50%; animation: bounce 1s infinite 0.2s;"></span>
                         <span style="width:4px; height:4px; background:#9CA3AF; border-radius:50%; animation: bounce 1s infinite 0.4s;"></span>
                     </div>
-                    <span>AI가 답변을 생성중입니다...</span>
+                    <span id="loading-text">${initialText}</span>
                 `;
 
                 chatBox.appendChild(loaderDiv);
                 chatBox.scrollTop = chatBox.scrollHeight;
+
+                // Dynamic text cycling
+                const messages = [
+                    "AI가 답변을 생성중입니다...",
+                    "잠시만 기다려주세요...",
+                    "열심히 답변을 작성하고 있어요...",
+                    "거의 다 되었습니다..."
+                ];
+                let msgIndex = 0;
+
+                // Clear any existing interval just in case
+                if (loadingInterval) clearInterval(loadingInterval);
+
+                loadingInterval = setInterval(() => {
+                    msgIndex = (msgIndex + 1) % messages.length;
+                    const textSpan = document.getElementById('loading-text');
+                    if (textSpan) {
+                        textSpan.innerText = messages[msgIndex];
+                    }
+                }, 2000); // Change every 2 seconds
+
             } else {
+                if (loadingInterval) {
+                    clearInterval(loadingInterval);
+                    loadingInterval = null;
+                }
                 if (existingLoader) existingLoader.remove();
             }
         }
