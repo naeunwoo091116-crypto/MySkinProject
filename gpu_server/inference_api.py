@@ -14,8 +14,8 @@ import os
 # 프로젝트 루트 경로 추가
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from services.ai_service import AIService
-from services.image_service import ImageService
+from services.ai_service import get_ai_service
+from services.image_service import get_image_service
 from services.chatbot_service import get_chatbot_service
 from core.logger import setup_logger
 
@@ -25,8 +25,8 @@ CORS(app)  # 모든 도메인에서 API 호출 허용
 logger = setup_logger(__name__)
 
 # AI 서비스 초기화 (GPU 사용)
-ai_service = AIService()
-image_service = ImageService()
+ai_service = get_ai_service()
+image_service = get_image_service()
 
 # 챗봇 서비스 (Lazy loading - 첫 요청 시 로드)
 chatbot_service = None

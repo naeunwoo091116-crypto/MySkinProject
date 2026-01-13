@@ -18,35 +18,38 @@ except ImportError:
 # 데이터베이스 설정
 DATABASE_URL = os.getenv('DATABASE_URL', 'postgresql://postgres:password@localhost/skin_analysis')
 
-# AI 모델 설정
+# 프로젝트 루트 디렉토리 (절대 경로 계산)
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# AI 모델 설정 (절대 경로 사용)
 MODEL_CONFIGS = {
     "forehead": {
-        "path": "models/forehead_model.pth",
+        "path": os.path.join(BASE_DIR, "models/forehead_model.pth"),
         "num_classes": 4,
         "num_targets": 15
     },
     "eye_l": {
-        "path": "models/left_eye_model.pth",
+        "path": os.path.join(BASE_DIR, "models/left_eye_model.pth"),
         "num_classes": 4,
         "num_targets": 8
     },
     "eye_r": {
-        "path": "models/right_eye_model.pth",
+        "path": os.path.join(BASE_DIR, "models/right_eye_model.pth"),
         "num_classes": 4,
         "num_targets": 8
     },
     "cheek_l": {
-        "path": "models/left_cheek_model.pth",
+        "path": os.path.join(BASE_DIR, "models/left_cheek_model.pth"),
         "num_classes": 4,
         "num_targets": 16
     },
     "cheek_r": {
-        "path": "models/right_cheek_model.pth",
+        "path": os.path.join(BASE_DIR, "models/right_cheek_model.pth"),
         "num_classes": 4,
         "num_targets": 16
     },
     "chin": {
-        "path": "models/chin_model.pth",
+        "path": os.path.join(BASE_DIR, "models/chin_model.pth"),
         "num_classes": 4,
         "num_targets": 15
     }

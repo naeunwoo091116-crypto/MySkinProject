@@ -128,6 +128,31 @@ class AIModelService:
         """
         return self.transform(pil_image).unsqueeze(0)
 
+    def predict_all_regions(self, pil_image):
+        """
+        PIL 이미지로 모든 부위 예측 (GPU 서버 API용)
+
+        Args:
+            pil_image: PIL Image 객체
+
+        Returns:
+            dict: {zone: {"cls_output": [...], "reg_output": [...]}}
+        """
+        # 이미지 전처리
+        image_tensor = self.preprocess_image(pil_image)
+
+        results = {}
+        for zone in self.models.keys():
+            cls_out, reg_out = self.predict(image_tensor, zone)
+
+            # 텐서를 리스트로 변환 (JSON 직렬화 가능하도록)
+            results[zone] = {
+                "cls_output": cls_out.cpu().numpy().tolist(),
+                "reg_output": reg_out.cpu().numpy().tolist()
+            }
+
+        return results
+
 
 # 싱글톤 인스턴스
 _ai_service_instance = None
