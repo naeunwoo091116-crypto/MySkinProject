@@ -51,8 +51,14 @@ class RemoteAIService:
             )
 
             if response.status_code != 200:
-                error_msg = response.json().get('message', 'Unknown error')
-                raise Exception(f"GPU server error: {error_msg}")
+                try:
+                    error_data = response.json()
+                    error_msg = error_data.get('message', error_data.get('error', 'Unknown error'))
+                    logger.error(f"❌ GPU server error ({response.status_code}): {error_msg}")
+                    logger.error(f"Full response: {error_data}")
+                except:
+                    logger.error(f"❌ GPU server error ({response.status_code}): {response.text}")
+                raise Exception(f"GPU server error ({response.status_code}): {error_msg if 'error_msg' in locals() else response.text}")
 
             result = response.json()
             logger.info(f"✅ GPU inference completed on {result.get('device', 'unknown')}")
