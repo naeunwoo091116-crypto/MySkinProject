@@ -1,50 +1,22 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-*.pyc
-venv1/
+# 1. 가상환경 제외 (매우 무거움)
+.venv/
 venv/
 env/
-ENV/
+bin/
+lib/
+share/
 
-# IDEs
-.vscode/
-.idea/
-*.swp
-*.swo
+# 2. AI 모델 폴더 제외 (이미 Vertex AI에 올렸으므로 Cloud Run에는 필요 없음)
+# 이 부분이 업로드 속도를 결정합니다.
+llava_server/
+final/
 
-# OS
-.DS_Store
-Thumbs.db
-
-# Git
+# 3. 기타 불필요한 파일
 .git/
 .gitignore
-
-# Logs
-logs/*.log
-*.log
-
-# Local development
-.env
-.env.local
-
-# Database
-*.db
-*.sqlite
-*.sqlite3
-
-# Documentation
-README.md
-CLAUDE.md
-*.md
-
-# Test files
-test_*.py
-tests/
-
-# Large files (모델 파일은 포함해야 함)
-# models/*.pth  # 주석 처리: 모델 파일은 배포에 필요함
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.db
+.sqlite3

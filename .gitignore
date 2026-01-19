@@ -44,3 +44,5 @@ logs/*.log
 # Deployment configs (로컬용)
 app.yaml
 DEPLOYMENT.md
+
+final/

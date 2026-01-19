@@ -249,6 +249,7 @@ def login_user():
 # device_bp (Blueprint)로 이동됨
 
 if __name__ == '__main__':
-    # 0.0.0.0으로 설정하여 모든 네트워크 인터페이스에서 접근 가능
-    # 모바일 앱에서 연결하려면 필수!
-    app.run(host='0.0.0.0', debug=False, port=5001)
+    import os
+    # Cloud Run은 환경 변수 'PORT'를 사용합니다. 없으면 8080을 기본값으로 사용.
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host='0.0.0.0', debug=False, port=port)

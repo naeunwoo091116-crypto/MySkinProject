@@ -1,0 +1,8 @@
+.venv
+venv
+__pycache__
+.git
+.ipynb_checkpoints
+# 이미 클라우드에 올린 무거운 폴더들 제외
+llava_server/
+final/
