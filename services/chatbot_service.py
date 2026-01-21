@@ -33,18 +33,20 @@ class ChatbotService:
                 # 이미지가 있을 때만 <image> 태그 포함
                 formatted_prompt = f"""USER: <image>
 {message.strip()}
-Please provide your answer in the following format:
-Chain-of-Thought: [Detailed analysis of skin condition, environmental factors, and scientific reasoning for ingredient selection]
-Answer: [Final skincare recommendations with specific ingredients and usage instructions]
+
+[STRICT RULE] Your ENTIRE response must be under 150 words. Be concise.
+Chain-of-Thought: (2-3 sentences max)
+Answer: (3-4 sentences max)
 ASSISTANT:"""
             except Exception as e:
                 return f"이미지 처리 오류: {str(e)}"
         else:
             # 이미지가 없을 때는 <image> 태그 제거
             formatted_prompt = f"""USER: {message.strip()}
-Please provide your answer in the following format:
-Chain-of-Thought: [Detailed analysis of skin condition, environmental factors, and scientific reasoning for ingredient selection]
-Answer: [Final skincare recommendations with specific ingredients and usage instructions]
+
+[STRICT RULE] Your ENTIRE response must be under 150 words. Be concise.
+Chain-of-Thought: (2-3 sentences max)
+Answer: (3-4 sentences max)
 ASSISTANT:"""
 
         instances[0]["prompt"] = formatted_prompt
@@ -56,8 +58,19 @@ ASSISTANT:"""
                 ans = prediction.predictions[0]
                 # 답변에서 ASSISTANT: 이후만 추출
                 if "ASSISTANT:" in ans:
-                    return ans.split("ASSISTANT:")[-1].strip()
-                return ans.strip()
+                    reply = ans.split("ASSISTANT:")[-1].strip()
+                else:
+                    reply = ans.strip()
+
+                # 후처리: Chain-of-Thought만 사용, Answer 부분 제거
+                if "Answer:" in reply:
+                    reply = reply.split("Answer:")[0].strip()
+
+                # Chain-of-Thought: 라벨 제거 (내용만 반환)
+                if reply.startswith("Chain-of-Thought:"):
+                    reply = reply.replace("Chain-of-Thought:", "").strip()
+
+                return reply
             return "답변을 생성할 수 없습니다."
         except Exception as e:
             return f"AI 상담 중 오류 발생: {str(e)}"

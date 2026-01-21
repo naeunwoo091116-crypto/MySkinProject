@@ -1750,24 +1750,37 @@
             }
         `;
         document.head.appendChild(styleSheet);
-        // 3. BLE Logic (Backend API 사용)
+        // 3. BLE Logic (Web Bluetooth API 사용)
         // ============================================
-        async function checkBleStatus() {
-            try {
-                const response = await fetch('/api/v1/ble/status');
-                const data = await response.json();
+        // BLE 디바이스 및 특성 저장
+        let bleDevice = null;
+        let bleCharacteristic = null;
 
-                if (data.connected && data.status !== 'disconnected') {
-                    state.connected = true;
-                    state.bleDeviceName = 'MySkin_LED_Mask';
-                    updateBleStatus(true, state.bleDeviceName);
-                    console.log('BLE 디바이스 이미 연결됨');
-                } else {
-                    state.connected = false;
-                    updateBleStatus(false);
-                }
-            } catch (error) {
-                console.error('BLE 상태 확인 오류:', error);
+        // 일반적인 BLE UART 서비스 UUID 목록 (Seeed Xiao 등에서 사용)
+        const COMMON_SERVICE_UUIDS = [
+            '0000ffe0-0000-1000-8000-00805f9b34fb',  // HM-10, Seeed Xiao 기본
+            '6e400001-b5a3-f393-e0a9-e50e24dcca9e',  // Nordic UART Service
+            '0000fff0-0000-1000-8000-00805f9b34fb',  // 일부 BLE 모듈
+            '49535343-fe7d-4ae5-8fa9-9fafd205e455',  // Microchip BLE
+        ];
+
+        const COMMON_CHARACTERISTIC_UUIDS = [
+            '0000ffe1-0000-1000-8000-00805f9b34fb',  // HM-10, Seeed Xiao 기본 (TX/RX)
+            '6e400002-b5a3-f393-e0a9-e50e24dcca9e',  // Nordic UART RX
+            '6e400003-b5a3-f393-e0a9-e50e24dcca9e',  // Nordic UART TX
+            '0000fff1-0000-1000-8000-00805f9b34fb',  // 일부 BLE 모듈
+            '49535343-1e4d-4bd9-ba61-23c647249616',  // Microchip TX
+        ];
+
+        async function checkBleStatus() {
+            // Web Bluetooth는 사용자 제스처 없이 자동 연결 불가
+            // 기존 연결 상태만 확인
+            if (bleDevice && bleDevice.gatt.connected) {
+                state.connected = true;
+                state.bleDeviceName = bleDevice.name || 'BLE 디바이스';
+                updateBleStatus(true, state.bleDeviceName);
+                console.log('BLE 디바이스 이미 연결됨');
+            } else {
                 state.connected = false;
                 updateBleStatus(false);
             }
@@ -1783,31 +1796,102 @@
 
         async function connectBle() {
             try {
-                showToast('BLE 디바이스 연결 중...', 'info');
+                // Web Bluetooth API 지원 확인
+                if (!navigator.bluetooth) {
+                    showToast('이 브라우저는 Bluetooth를 지원하지 않습니다. Chrome을 사용해주세요.', 'error');
+                    return;
+                }
 
-                // 백엔드 API로 BLE 연결 요청
-                const response = await fetch('/api/v1/ble/connect', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({})  // 자동으로 MySkin_LED_Mask 검색
+                showToast('BLE 디바이스 검색 중...', 'info');
+
+                // 모든 BLE 디바이스 검색 허용 (acceptAllDevices)
+                bleDevice = await navigator.bluetooth.requestDevice({
+                    acceptAllDevices: true,
+                    optionalServices: COMMON_SERVICE_UUIDS
                 });
 
-                const data = await response.json();
+                showToast('디바이스 연결 중...', 'info');
+                console.log('선택된 디바이스:', bleDevice.name);
 
-                if (data.success) {
-                    state.connected = true;
-                    state.bleDeviceName = 'MySkin_LED_Mask';
-                    updateBleStatus(true, state.bleDeviceName);
-                    showToast('BLE 디바이스 연결 성공!', 'success');
-                } else {
-                    throw new Error(data.message || '연결 실패');
+                // GATT 서버 연결
+                const server = await bleDevice.gatt.connect();
+
+                // 사용 가능한 서비스 자동 탐색
+                let service = null;
+                for (const serviceUUID of COMMON_SERVICE_UUIDS) {
+                    try {
+                        service = await server.getPrimaryService(serviceUUID);
+                        console.log('서비스 발견:', serviceUUID);
+                        break;
+                    } catch (e) {
+                        continue;
+                    }
                 }
+
+                if (!service) {
+                    throw new Error('지원되는 BLE 서비스를 찾을 수 없습니다.');
+                }
+
+                // 사용 가능한 특성 자동 탐색
+                for (const charUUID of COMMON_CHARACTERISTIC_UUIDS) {
+                    try {
+                        bleCharacteristic = await service.getCharacteristic(charUUID);
+                        console.log('특성 발견:', charUUID);
+                        break;
+                    } catch (e) {
+                        continue;
+                    }
+                }
+
+                if (!bleCharacteristic) {
+                    // 특성을 못 찾으면 서비스의 모든 특성 중 쓰기 가능한 것 사용
+                    const characteristics = await service.getCharacteristics();
+                    for (const char of characteristics) {
+                        if (char.properties.write || char.properties.writeWithoutResponse) {
+                            bleCharacteristic = char;
+                            console.log('쓰기 가능한 특성 발견:', char.uuid);
+                            break;
+                        }
+                    }
+                }
+
+                if (!bleCharacteristic) {
+                    throw new Error('쓰기 가능한 BLE 특성을 찾을 수 없습니다.');
+                }
+
+                // 연결 해제 이벤트 리스너
+                bleDevice.addEventListener('gattserverdisconnected', onBleDisconnected);
+
+                state.connected = true;
+                state.bleDeviceName = bleDevice.name || 'BLE 디바이스';
+                updateBleStatus(true, state.bleDeviceName);
+                showToast(`${state.bleDeviceName} 연결 성공!`, 'success');
+                console.log('BLE 연결 완료:', bleDevice.name);
+
             } catch (error) {
                 console.error('BLE 연결 오류:', error);
-                showToast('연결 실패: ' + error.message, 'error');
+                if (error.name === 'NotFoundError') {
+                    showToast('디바이스를 찾을 수 없습니다.', 'error');
+                } else if (error.name === 'SecurityError') {
+                    showToast('Bluetooth 권한이 필요합니다.', 'error');
+                } else if (error.message.includes('User cancelled')) {
+                    showToast('디바이스 선택이 취소되었습니다.', 'info');
+                } else {
+                    showToast('연결 실패: ' + error.message, 'error');
+                }
                 state.connected = false;
                 updateBleStatus(false);
             }
+        }
+
+        function onBleDisconnected(event) {
+            console.log('BLE 연결 해제됨:', event.target.name);
+            state.connected = false;
+            state.bleDeviceName = '';
+            bleDevice = null;
+            bleCharacteristic = null;
+            updateBleStatus(false);
+            showToast('기기 연결이 해제되었습니다.', 'info');
         }
 
         async function disconnectBle() {
@@ -1815,16 +1899,14 @@
                 // 연결 해제 시 모든 동작 정지
                 stopTherapy(false);
 
-                // 백엔드 API로 연결 해제 요청
-                const response = await fetch('/api/v1/ble/disconnect', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' }
-                });
-
-                const data = await response.json();
+                if (bleDevice && bleDevice.gatt.connected) {
+                    bleDevice.gatt.disconnect();
+                }
 
                 state.connected = false;
                 state.bleDeviceName = '';
+                bleDevice = null;
+                bleCharacteristic = null;
                 updateBleStatus(false);
                 showToast('기기 연결이 해제되었습니다.', 'info');
             } catch (error) {
@@ -1835,44 +1917,25 @@
         }
 
         async function sendLedCommand(command) {
-            if (!state.connected) {
+            if (!state.connected || !bleCharacteristic) {
                 showToast("기기 연결 필요", "error");
                 return;
             }
 
             try {
-                // 명령어 파싱 (예: "START:RED:20")
+                // 명령어를 UTF-8 바이트로 변환하여 전송
+                const encoder = new TextEncoder();
+                const data = encoder.encode(command);
+
+                await bleCharacteristic.writeValue(data);
+                console.log("BLE 명령 전송 성공:", command);
+
+                // 명령어 파싱하여 UI 업데이트
                 const parts = command.split(':');
-
                 if (parts[0] === 'START' && parts.length === 3) {
-                    const mode = parts[1].toLowerCase();
-                    const duration = parseInt(parts[2]);
-
-                    const response = await fetch('/api/v1/ble/therapy/start', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ mode, duration })
-                    });
-
-                    const data = await response.json();
-                    if (!data.success) {
-                        throw new Error(data.message || '명령 전송 실패');
-                    }
-                    console.log("LED 테라피 시작:", data);
-
+                    console.log("LED 테라피 시작:", parts[1], parts[2] + "분");
                 } else if (parts[0] === 'STOP') {
-                    const response = await fetch('/api/v1/ble/therapy/stop', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' }
-                    });
-
-                    const data = await response.json();
-                    if (!data.success) {
-                        throw new Error(data.message || '중지 실패');
-                    }
-                    console.log("LED 테라피 중지:", data);
-                } else {
-                    console.log("알 수 없는 명령:", command);
+                    console.log("LED 테라피 중지");
                 }
 
             } catch (error) {
